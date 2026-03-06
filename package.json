@@ -1,0 +1,56 @@
+{
+  "name": "n8n-nodes-tukimate",
+  "version": "1.0.0",
+  "description": "n8n community node for TukiMate API",
+  "keywords": [
+    "n8n",
+    "n8n-community-node-package",
+    "tukimate",
+    "conversations",
+    "crm"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/broobe/n8n-nodes-tukimate#readme",
+  "author": {
+    "name": "Broobe",
+    "email": "contact@broobe.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/broobe/n8n-nodes-tukimate.git"
+  },
+  "engines": {
+    "node": ">=18.10",
+    "pnpm": ">=9.1"
+  },
+  "packageManager": "pnpm@9.1.4",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint nodes credentials --ext .ts",
+    "lintfix": "eslint nodes credentials --ext .ts --fix",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/TukiMateApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/TukiMate/TukiMate.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "n8n-workflow": "^1.0.0",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "n8n-workflow": ">=1.0.0"
+  }
+}
