@@ -989,6 +989,25 @@ export class TukiMate implements INodeType {
 				default: OPERATIONS.LIST,
 			},
 			{
+				displayName: 'Status Filter',
+				name: 'projectStatusFilter',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.PROJECT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Active', value: 'active' },
+					{ name: 'Archived', value: 'archived' },
+					{ name: 'Completed', value: 'completed' },
+				],
+				default: '',
+				description: 'Filter by project status',
+			},
+			{
 				displayName: 'Project ID',
 				name: 'projectId',
 				type: 'string',
@@ -1539,7 +1558,12 @@ export class TukiMate implements INodeType {
 				// ==================== PROJECT ====================
 				else if (resource === RESOURCES.PROJECT) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/projects');
+						const projectStatusFilter = this.getNodeParameter('projectStatusFilter', i, '') as string;
+
+						const query: Record<string, string> = {};
+						if (projectStatusFilter) query.status = projectStatusFilter;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/projects', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const projectId = this.getNodeParameter('projectId', i) as string;
