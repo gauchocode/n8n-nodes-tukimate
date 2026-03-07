@@ -1832,6 +1832,212 @@ export class TukiMate implements INodeType {
 				],
 				default: 'getStats',
 			},
+
+			// ==================== OPPORTUNITY ====================
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+					},
+				},
+				options: [
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of opportunities' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single opportunity' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new opportunity' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update an opportunity' },
+				],
+				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Opportunity ID',
+				name: 'opportunityId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'The ID of the opportunity',
+			},
+			{
+				displayName: 'Title',
+				name: 'opportunityTitle',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Title of the opportunity',
+			},
+			{
+				displayName: 'Type',
+				name: 'opportunityType',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				options: [
+					{ name: 'New Sale', value: 'nueva_venta' },
+					{ name: 'Upselling', value: 'upselling' },
+					{ name: 'Renewal/Retention', value: 'renovacion_retencion' },
+					{ name: 'Cross Sell', value: 'cross_sell' },
+				],
+				default: 'nueva_venta',
+				description: 'Type of opportunity',
+			},
+			{
+				displayName: 'Status',
+				name: 'opportunityStatus',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE, OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Pending', value: 'pending' },
+					{ name: 'Approved', value: 'approved' },
+					{ name: 'Rejected', value: 'rejected' },
+					{ name: 'Converted', value: 'converted' },
+				],
+				default: '',
+				description: 'Status of the opportunity',
+			},
+			{
+				displayName: 'Confidence',
+				name: 'opportunityConfidence',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: 0.5,
+				description: 'Confidence score (0-1)',
+			},
+			{
+				displayName: 'Estimated Value',
+				name: 'opportunityValue',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: 0,
+				description: 'Estimated value of the opportunity',
+			},
+			{
+				displayName: 'Currency',
+				name: 'opportunityCurrency',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: 'USD',
+				description: 'Currency code (e.g., USD, EUR)',
+			},
+			{
+				displayName: 'Description',
+				name: 'opportunityDescription',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Description of the opportunity',
+				typeOptions: {
+					rows: 4,
+				},
+			},
+			{
+				displayName: 'Signals',
+				name: 'opportunitySignals',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Comma-separated signals/indicators',
+			},
+			{
+				displayName: 'Expected Close Date',
+				name: 'opportunityCloseDate',
+				type: 'dateTime',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Expected close date',
+			},
+			{
+				displayName: 'Conversation ID',
+				name: 'opportunityConversationId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Related conversation ID',
+			},
+			{
+				displayName: 'Limit',
+				name: 'opportunityLimit',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: 50,
+				description: 'Max number of results',
+			},
+			{
+				displayName: 'Offset',
+				name: 'opportunityOffset',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: 0,
+				description: 'Number of results to skip',
+			},
 		],
 	};
 
@@ -2357,6 +2563,78 @@ export class TukiMate implements INodeType {
 					else if (operation === OPERATIONS.GET) {
 						const analysisId = this.getNodeParameter('analysisId', i) as string;
 						responseData = await tukiMateRequest.call(this, 'GET', `/analyses/${analysisId}`);
+					}
+				}
+
+				// ==================== OPPORTUNITY ====================
+				else if (resource === RESOURCES.OPPORTUNITY) {
+					if (operation === OPERATIONS.LIST) {
+						const opportunityStatus = this.getNodeParameter('opportunityStatus', i, '') as string;
+						const opportunityConversationId = this.getNodeParameter('opportunityConversationId', i, '') as string;
+						const opportunityLimit = this.getNodeParameter('opportunityLimit', i, 50) as number;
+						const opportunityOffset = this.getNodeParameter('opportunityOffset', i, 0) as number;
+
+						const query: Record<string, string | number> = { limit: opportunityLimit, offset: opportunityOffset };
+						if (opportunityStatus) query.status = opportunityStatus;
+						if (opportunityConversationId) query.conversation_id = opportunityConversationId;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/opportunities', undefined, query);
+					}
+					else if (operation === OPERATIONS.GET) {
+						const opportunityId = this.getNodeParameter('opportunityId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'GET', `/opportunities/${opportunityId}`);
+					}
+					else if (operation === OPERATIONS.CREATE) {
+						const opportunityTitle = this.getNodeParameter('opportunityTitle', i) as string;
+						const opportunityType = this.getNodeParameter('opportunityType', i, 'nueva_venta') as string;
+						const opportunityStatus = this.getNodeParameter('opportunityStatus', i, 'pending') as string;
+						const opportunityConfidence = this.getNodeParameter('opportunityConfidence', i, 0.5) as number;
+						const opportunityValue = this.getNodeParameter('opportunityValue', i, 0) as number;
+						const opportunityCurrency = this.getNodeParameter('opportunityCurrency', i, 'USD') as string;
+						const opportunityDescription = this.getNodeParameter('opportunityDescription', i, '') as string;
+						const opportunitySignals = this.getNodeParameter('opportunitySignals', i, '') as string;
+						const opportunityCloseDate = this.getNodeParameter('opportunityCloseDate', i, '') as string;
+						const opportunityConversationId = this.getNodeParameter('opportunityConversationId', i, '') as string;
+
+						const body: any = {
+							title: opportunityTitle,
+							type: opportunityType,
+							status: opportunityStatus || 'pending',
+							confidence: opportunityConfidence,
+							estimated_value: opportunityValue,
+							currency: opportunityCurrency,
+						};
+						if (opportunityDescription) body.description = opportunityDescription;
+						if (opportunitySignals) body.signals = opportunitySignals.split(',').map(s => s.trim());
+						if (opportunityCloseDate) body.expected_close_date = opportunityCloseDate;
+						if (opportunityConversationId) body.conversation_id = opportunityConversationId;
+
+						responseData = await tukiMateRequest.call(this, 'POST', '/opportunities', body);
+					}
+					else if (operation === OPERATIONS.UPDATE) {
+						const opportunityId = this.getNodeParameter('opportunityId', i) as string;
+						const opportunityTitle = this.getNodeParameter('opportunityTitle', i, '') as string;
+						const opportunityType = this.getNodeParameter('opportunityType', i, '') as string;
+						const opportunityStatus = this.getNodeParameter('opportunityStatus', i, '') as string;
+						const opportunityConfidence = this.getNodeParameter('opportunityConfidence', i, undefined) as number | undefined;
+						const opportunityValue = this.getNodeParameter('opportunityValue', i, undefined) as number | undefined;
+						const opportunityCurrency = this.getNodeParameter('opportunityCurrency', i, '') as string;
+						const opportunityDescription = this.getNodeParameter('opportunityDescription', i, '') as string;
+						const opportunitySignals = this.getNodeParameter('opportunitySignals', i, '') as string;
+						const opportunityCloseDate = this.getNodeParameter('opportunityCloseDate', i, '') as string;
+
+						const body: any = {};
+						if (opportunityTitle) body.title = opportunityTitle;
+						if (opportunityType) body.type = opportunityType;
+						if (opportunityStatus) body.status = opportunityStatus;
+						if (opportunityConfidence !== undefined) body.confidence = opportunityConfidence;
+						if (opportunityValue !== undefined) body.estimated_value = opportunityValue;
+						if (opportunityCurrency) body.currency = opportunityCurrency;
+						if (opportunityDescription) body.description = opportunityDescription;
+						if (opportunitySignals) body.signals = opportunitySignals.split(',').map(s => s.trim());
+						if (opportunityCloseDate) body.expected_close_date = opportunityCloseDate;
+
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/opportunities/${opportunityId}`, body);
 					}
 				}
 
