@@ -19,6 +19,7 @@ const RESOURCES = {
 	CLIENT: 'client',
 	SOURCE: 'source',
 	CONVERSATION_TYPE: 'conversationType',
+	TAG: 'tag',
 };
 
 // Operation definitions
@@ -109,7 +110,8 @@ async function getProjectOptions(this: ILoadOptionsFunctions): Promise<INodeProp
 		json: true,
 	});
 
-	const projects = Array.isArray(response) ? response : [];
+	// Handle both array response and nested data
+	const projects = Array.isArray(response) ? response : (response?.data || []);
 	return projects.map((project: any) => ({
 		name: project.name,
 		value: project.id,
@@ -129,7 +131,8 @@ async function getClientOptions(this: ILoadOptionsFunctions): Promise<INodePrope
 		json: true,
 	});
 
-	const clients = Array.isArray(response) ? response : [];
+	// Handle both array response and nested data
+	const clients = Array.isArray(response) ? response : (response?.data || []);
 	return clients.map((client: any) => ({
 		name: client.name,
 		value: client.id,
@@ -176,6 +179,40 @@ async function getConversationTypeOptions(this: ILoadOptionsFunctions): Promise<
 	}));
 }
 
+// Fields to keep for simplified output per resource
+const SIMPLIFIED_FIELDS: Record<string, string[]> = {
+	conversation: ['id', 'title', 'description', 'dateTime', 'durationMinutes', 'status', 'team_id', 'project_id', 'client_id', 'sourceKey', 'conversationTypeKey', 'ai_context', 'sentiment'],
+	contact: ['id', 'firstName', 'lastName', 'email', 'phone', 'company', 'job_title'],
+	team: ['id', 'name', 'description', 'color'],
+	project: ['id', 'name', 'description', 'status', 'client_id', 'ai_context'],
+	client: ['id', 'name', 'code', 'type', 'status', 'industry', 'website'],
+	source: ['id', 'key', 'label', 'active'],
+};
+
+// Fields to always exclude
+const EXCLUDED_FIELDS = ['tenant_id', 'created_at', 'updated_at', 'deleted_at'];
+
+function simplifyResponse(data: any, resource: string): any {
+	const allowedFields = SIMPLIFIED_FIELDS[resource] || [];
+
+	const filterObject = (obj: any): any => {
+		if (!obj || typeof obj !== 'object') return obj;
+		const filtered: any = {};
+		for (const key of Object.keys(obj)) {
+			if (EXCLUDED_FIELDS.includes(key)) continue;
+			if (allowedFields.length === 0 || allowedFields.includes(key)) {
+				filtered[key] = obj[key];
+			}
+		}
+		return filtered;
+	};
+
+	if (Array.isArray(data)) {
+		return data.map(filterObject);
+	}
+	return filterObject(data);
+}
+
 export class TukiMate implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'TukiMate',
@@ -184,12 +221,13 @@ export class TukiMate implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Interact with TukiMate API',
+		description: 'Interact with TukiMate API (conversations, contacts, teams, projects, clients, sources)',
 		defaults: {
 			name: 'TukiMate',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'tukiMateApi',
@@ -218,8 +256,24 @@ export class TukiMate implements INodeType {
 					{ name: 'Client', value: RESOURCES.CLIENT },
 					{ name: 'Source', value: RESOURCES.SOURCE },
 					{ name: 'Conversation Type', value: RESOURCES.CONVERSATION_TYPE },
+					{ name: 'Tag', value: RESOURCES.TAG },
 				],
 				default: RESOURCES.CONVERSATION,
+			},
+
+			// Simplified output option
+			{
+				displayName: 'Simplified Output',
+				name: 'simplifiedOutput',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION, RESOURCES.CONTACT, RESOURCES.TEAM, RESOURCES.PROJECT, RESOURCES.CLIENT, RESOURCES.SOURCE],
+						operation: [OPERATIONS.LIST, OPERATIONS.GET],
+					},
+				},
+				default: false,
+				description: 'Return only essential fields (id, name, description, etc.) and exclude internal fields like tenant_id',
 			},
 
 			// ==================== CONVERSATION ====================
@@ -258,6 +312,19 @@ export class TukiMate implements INodeType {
 				description: 'Search term to filter conversations',
 			},
 			{
+				displayName: 'External Meeting ID',
+				name: 'externalMeetingId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by external meeting source ID (e.g., Zoom meeting ID, Google Meet ID)',
+			},
+			{
 				displayName: 'Team',
 				name: 'teamId',
 				type: 'options',
@@ -272,6 +339,22 @@ export class TukiMate implements INodeType {
 				},
 				default: '',
 				description: 'Filter or set by team',
+			},
+			{
+				displayName: 'Client',
+				name: 'clientId',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getClients',
+				},
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST, OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Filter or set by client',
 			},
 			{
 				displayName: 'Project',
@@ -299,7 +382,7 @@ export class TukiMate implements INodeType {
 						operation: [OPERATIONS.LIST],
 					},
 				},
-				default: 100,
+				default: 10,
 				description: 'Max number of results',
 			},
 			{
@@ -422,22 +505,6 @@ export class TukiMate implements INodeType {
 				},
 				default: 'meeting',
 				description: 'Type of conversation',
-			},
-			{
-				displayName: 'Client',
-				name: 'clientId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getClients',
-				},
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
-					},
-				},
-				default: '',
-				description: 'Associated client',
 			},
 			{
 				displayName: 'Description',
@@ -957,6 +1024,38 @@ export class TukiMate implements INodeType {
 				],
 				default: OPERATIONS.LIST,
 			},
+
+			// ==================== TAG ====================
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG],
+					},
+				},
+				options: [
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of all available tags' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get tags for a conversation' },
+				],
+				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Conversation ID',
+				name: 'conversationId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG],
+						operation: [OPERATIONS.GET],
+					},
+				},
+				default: '',
+				description: 'The ID of the conversation to get tags from',
+			},
 		],
 	};
 
@@ -985,15 +1084,19 @@ export class TukiMate implements INodeType {
 				if (resource === RESOURCES.CONVERSATION) {
 					if (operation === OPERATIONS.LIST) {
 						const search = this.getNodeParameter('search', i, '') as string;
+						const externalMeetingId = this.getNodeParameter('externalMeetingId', i, '') as string;
 						const teamId = this.getNodeParameter('teamId', i, '') as string;
 						const projectId = this.getNodeParameter('projectId', i, '') as string;
-						const limit = this.getNodeParameter('limit', i, 100) as number;
+						const clientId = this.getNodeParameter('clientId', i, '') as string;
+						const limit = this.getNodeParameter('limit', i, 10) as number;
 						const offset = this.getNodeParameter('offset', i, 0) as number;
 
 						const query: Record<string, string | number> = { limit, offset };
 						if (search) query.q = search;
+						if (externalMeetingId) query.external_meeting_id = externalMeetingId;
 						if (teamId) query.team = teamId;
 						if (projectId) query.project = projectId;
+						if (clientId) query.client = clientId;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/conversations', undefined, query);
 					}
@@ -1265,11 +1368,30 @@ export class TukiMate implements INodeType {
 					}
 				}
 
+				// ==================== TAG ====================
+				else if (resource === RESOURCES.TAG) {
+					if (operation === OPERATIONS.LIST) {
+						responseData = await tukiMateRequest.call(this, 'GET', '/tags');
+					}
+					else if (operation === OPERATIONS.GET) {
+						const conversationId = this.getNodeParameter('conversationId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'GET', `/conversations/${conversationId}/tags`);
+					}
+				}
+
 				// Handle response data
-				if (Array.isArray(responseData)) {
-					returnData.push(...responseData.map((item) => ({ json: item })));
-				} else if (responseData) {
-					returnData.push({ json: responseData });
+				if (responseData) {
+					// Check if simplified output is requested
+					const simplifiedOutput = this.getNodeParameter('simplifiedOutput', i, false) as boolean;
+					if (simplifiedOutput && resource !== RESOURCES.CONVERSATION_TYPE && resource !== RESOURCES.TAG) {
+						responseData = simplifyResponse(responseData, resource);
+					}
+
+					if (Array.isArray(responseData)) {
+						returnData.push(...responseData.map((item) => ({ json: item })));
+					} else {
+						returnData.push({ json: responseData });
+					}
 				}
 			} catch (error: any) {
 				if (this.continueOnFail()) {

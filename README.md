@@ -34,15 +34,27 @@ In n8n:
 4. Paste your API key
 5. Save
 
+## AI Agent Support
+
+This node can be used as a tool in n8n AI Agent workflows. Simply add it to your AI Agent's tools to enable the agent to interact with TukiMate resources.
+
 ## Supported Resources & Operations
 
 ### Conversation
 | Operation | Description |
 |-----------|-------------|
-| List | Get a list of conversations with optional filters |
+| List | Get a list of conversations with optional filters (search, external meeting ID, team, client, project) |
 | Get | Get a single conversation by ID |
 | Create | Create a new conversation |
 | Update | Update an existing conversation |
+
+**List Filters:**
+- **Search** - Text search in conversation content
+- **External Meeting ID** - Filter by external meeting source ID (e.g., Zoom, Google Meet)
+- **Team** - Filter by team
+- **Client** - Filter by client
+- **Project** - Filter by project
+- **Limit/Offset** - Pagination
 
 ### Contact
 | Operation | Description |
@@ -89,6 +101,27 @@ In n8n:
 |-----------|-------------|
 | List | Get available conversation types (read-only) |
 
+### Tag
+| Operation | Description |
+|-----------|-------------|
+| List | Get all available tags |
+| Get | Get tags for a specific conversation |
+
+## Simplified Output
+
+All List and Get operations include a **Simplified Output** option that returns only essential fields and excludes internal fields like `tenant_id`, `created_at`, `updated_at`, and `deleted_at`.
+
+**Fields included in simplified output:**
+
+| Resource | Fields |
+|----------|--------|
+| Conversation | id, title, description, dateTime, durationMinutes, status, team_id, project_id, client_id, sourceKey, conversationTypeKey, ai_context, sentiment |
+| Contact | id, firstName, lastName, email, phone, company, job_title |
+| Team | id, name, description, color |
+| Project | id, name, description, status, client_id, ai_context |
+| Client | id, name, code, type, status, industry, website |
+| Source | id, key, label, active |
+
 ## Example Usage
 
 ### Create a Conversation
@@ -113,21 +146,30 @@ In n8n:
 2. Select **Conversation** > **List**
 3. Optionally filter by:
    - Search term
+   - External Meeting ID
    - Team
+   - Client
    - Project
    - Limit/Offset for pagination
+4. Enable **Simplified Output** for cleaner responses
+
+### Find Conversation by External Meeting ID
+
+1. Add a **TukiMate** node
+2. Select **Conversation** > **List**
+3. Enter the **External Meeting ID** (e.g., Zoom meeting ID)
+4. Set **Limit** to 1
 
 ## Development
 
+This project uses Docker for builds:
+
 ```bash
-# Install dependencies
-pnpm install
-
 # Build
-pnpm build
+docker compose run build
 
-# Watch mode
-pnpm dev
+# Publish
+docker compose run publish
 ```
 
 ## License

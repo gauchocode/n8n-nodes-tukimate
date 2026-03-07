@@ -1,0 +1,14 @@
+services:
+  build:
+    build: .
+    volumes:
+      - ./dist:/app/dist
+    command: pnpm build
+
+  publish:
+    build: .
+    volumes:
+      - ./dist:/app/dist
+    env_file:
+      - .env
+    command: sh -c "echo '//registry.npmjs.org/:_authToken=$${NPM_TOKEN}' > ~/.npmrc && npm publish --access public"
