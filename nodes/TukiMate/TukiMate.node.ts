@@ -2086,7 +2086,7 @@ export class TukiMate implements INodeType {
 
 						const query: Record<string, string | number | boolean> = { limit, offset };
 						if (search) query.q = search;
-						if (externalMeetingId) query.external_meeting_id = externalMeetingId;
+						if (externalMeetingId) query.sourceMeetingId = externalMeetingId;
 						if (teamId) query.team = teamId;
 						if (projectId) query.project = projectId;
 						if (clientId) query.client = clientId;
@@ -2576,7 +2576,7 @@ export class TukiMate implements INodeType {
 
 						const query: Record<string, string | number> = { limit: opportunityLimit, offset: opportunityOffset };
 						if (opportunityStatus) query.status = opportunityStatus;
-						if (opportunityConversationId) query.conversation_id = opportunityConversationId;
+						if (opportunityConversationId) query.conversationId = opportunityConversationId;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/opportunities', undefined, query);
 					}
