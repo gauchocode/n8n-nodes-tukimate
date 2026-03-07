@@ -43,10 +43,12 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 ### Conversation
 | Operation | Description |
 |-----------|-------------|
-| List | Get a list of conversations with optional filters (search, external meeting ID, team, client, project) |
+| List | Get a list of conversations with optional filters |
 | Get | Get a single conversation by ID |
 | Create | Create a new conversation |
 | Update | Update an existing conversation |
+| Analyze | Trigger AI analysis on a conversation |
+| Delete | Delete a conversation |
 
 **List Filters:**
 - **Search** - Text search in conversation content
@@ -54,15 +56,47 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 - **Team** - Filter by team
 - **Client** - Filter by client
 - **Project** - Filter by project
+- **Contact** - Filter by contact ID
+- **Participant** - Filter by participant name
+- **Category** - Filter by category ID
+- **Date From/To** - Filter by date range
+- **Source** - Filter by source key
+- **Type** - Filter by conversation type
+- **Has Analyses** - Filter by analysis status
 - **Limit/Offset** - Pagination
+
+**Create/Update Fields:**
+- Title, Description, Overview
+- Date/Time, Duration
+- Transcript
+- Source Key, Source Conversation ID
+- Conversation Type
+- Language
+- Tags
+- Team, Client, Project
+- Participants
 
 ### Contact
 | Operation | Description |
 |-----------|-------------|
-| List | Get a list of contacts |
+| List | Get a list of contacts with optional filters |
 | Get | Get a single contact by ID |
 | Create | Create a new contact |
 | Update | Update an existing contact |
+| Delete | Delete a contact |
+
+**List Filters:**
+- **Search** - Search in name, email
+- **Company** - Filter by company
+- **Tags** - Filter by tags
+- **Limit/Offset** - Pagination
+
+**Create/Update Fields:**
+- First Name, Last Name
+- Email, Phone, Identifier
+- Job Title, Department
+- Company Name
+- Tags
 
 ### Team
 | Operation | Description |
@@ -71,22 +105,30 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | Get | Get a single team by ID |
 | Create | Create a new team |
 | Update | Update an existing team |
+| Delete | Delete a team |
 
 ### Project
 | Operation | Description |
 |-----------|-------------|
-| List | Get a list of projects |
+| List | Get a list of projects with optional status filter |
 | Get | Get a single project by ID |
 | Create | Create a new project |
 | Update | Update an existing project |
+| Delete | Delete a project |
 
 ### Client
 | Operation | Description |
 |-----------|-------------|
-| List | Get a list of clients |
+| List | Get a list of clients with optional filters |
 | Get | Get a single client by ID |
 | Create | Create a new client |
 | Update | Update an existing client |
+| Delete | Delete a client |
+
+**List Filters:**
+- **Type** - corporate, individual, partner
+- **Status** - active, inactive, prospect
+- **Limit/Offset** - Pagination
 
 ### Source
 | Operation | Description |
@@ -107,6 +149,76 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | List | Get a list of all available tags |
 | Get | Get a single tag by ID |
 | Get Conversation Tags | Get tags for a specific conversation |
+| Search | Search tags by name |
+| Delete | Delete a tag |
+
+### Tag Definition
+| Operation | Description |
+|-----------|-------------|
+| List | Get a list of tag definitions |
+| Create | Create a new tag definition |
+
+**Create Fields:**
+- Name, Color, Description
+- Category (type, role, status, custom)
+
+### Category
+| Operation | Description |
+|-----------|-------------|
+| List | Get a list of categories |
+| Get | Get a single category by ID |
+| Create | Create a new category |
+| Update | Update an existing category |
+| Delete | Delete a category |
+
+### Analysis
+| Operation | Description |
+|-----------|-------------|
+| List | Get a list of analyses with optional filters |
+| Get | Get a single analysis by ID |
+
+**List Filters:**
+- **Conversation ID** - Filter by conversation
+- **Status** - PENDING, PROCESSING, COMPLETED, FAILED
+- **Limit/Offset** - Pagination
+
+### Analysis Job
+| Operation | Description |
+|-----------|-------------|
+| List | Get a list of analysis jobs with optional filters |
+| Get | Get a single analysis job by ID |
+
+**List Filters:**
+- **Status** - QUEUED, PROCESSING, COMPLETED, FAILED
+- **Search** - Search term
+- **Page/Page Size** - Pagination
+
+### Opportunity
+| Operation | Description |
+|-----------|-------------|
+| List | Get a list of opportunities with optional filters |
+| Get | Get a single opportunity by ID |
+| Create | Create a new opportunity |
+| Update | Update an existing opportunity |
+
+**List Filters:**
+- **Status** - pending, approved, rejected, converted
+- **Conversation ID** - Filter by conversation
+- **Limit/Offset** - Pagination
+
+**Create/Update Fields:**
+- Title, Description
+- Type - upselling, nueva_venta, renovacion_retencion, cross_sell
+- Status, Confidence
+- Estimated Value, Currency
+- Signals (comma-separated)
+- Expected Close Date
+- Conversation ID
+
+### Usage
+| Operation | Description |
+|-----------|-------------|
+| Get Stats | Get API usage statistics and subscription limits |
 
 ## Simplified Output
 
@@ -140,6 +252,8 @@ All List and Get operations include a **Simplified Output** option that returns 
    - Project
    - Client
    - Participants
+   - Tags
+   - Language
 
 ### List Conversations with Filters
 
@@ -148,9 +262,10 @@ All List and Get operations include a **Simplified Output** option that returns 
 3. Optionally filter by:
    - Search term
    - External Meeting ID
-   - Team
-   - Client
-   - Project
+   - Team, Client, Project
+   - Date range
+   - Category
+   - Contact
    - Limit/Offset for pagination
 4. Enable **Simplified Output** for cleaner responses
 
@@ -160,6 +275,19 @@ All List and Get operations include a **Simplified Output** option that returns 
 2. Select **Conversation** > **List**
 3. Enter the **External Meeting ID** (e.g., Zoom meeting ID)
 4. Set **Limit** to 1
+
+### Trigger AI Analysis
+
+1. Add a **TukiMate** node
+2. Select **Conversation** > **Analyze**
+3. Enter the Conversation ID
+4. Optionally specify analysis config IDs
+
+### Get Usage Statistics
+
+1. Add a **TukiMate** node
+2. Select **Usage** > **Get Stats**
+3. View your API usage and limits
 
 ## Development
 
