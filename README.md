@@ -104,8 +104,9 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 ### Tag
 | Operation | Description |
 |-----------|-------------|
-| List | Get all available tags |
-| Get | Get tags for a specific conversation |
+| List | Get a list of all available tags |
+| Get | Get a single tag by ID |
+| Get Conversation Tags | Get tags for a specific conversation |
 
 ## Simplified Output
 
