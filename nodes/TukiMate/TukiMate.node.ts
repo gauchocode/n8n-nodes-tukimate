@@ -475,6 +475,19 @@ export class TukiMate implements INodeType {
 				},
 			},
 			{
+				displayName: 'Source Conversation ID',
+				name: 'sourceConversationId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'External conversation ID for deduplication (e.g., Zoom meeting ID)',
+			},
+			{
 				displayName: 'Source',
 				name: 'sourceKey',
 				type: 'options',
@@ -1124,6 +1137,7 @@ export class TukiMate implements INodeType {
 						const dateTime = this.getNodeParameter('dateTime', i) as string;
 						const durationMinutes = this.getNodeParameter('durationMinutes', i, 0) as number;
 						const transcript = this.getNodeParameter('transcript', i) as string;
+						const sourceConversationId = this.getNodeParameter('sourceConversationId', i, '') as string;
 						const sourceKey = this.getNodeParameter('sourceKey', i, '') as string;
 						const conversationTypeKey = this.getNodeParameter('conversationTypeKey', i, 'meeting') as string;
 						const teamId = this.getNodeParameter('teamId', i, '') as string;
@@ -1141,6 +1155,7 @@ export class TukiMate implements INodeType {
 							conversationTypeKey,
 						};
 
+						if (sourceConversationId) body.sourceConversationId = sourceConversationId;
 						if (teamId) body.team_id = teamId;
 						if (projectId) body.project_id = projectId;
 						if (clientId) body.client_id = clientId;
@@ -1156,6 +1171,7 @@ export class TukiMate implements INodeType {
 						const title = this.getNodeParameter('title', i, '') as string;
 						const durationMinutes = this.getNodeParameter('durationMinutes', i, undefined) as number | undefined;
 						const transcript = this.getNodeParameter('transcript', i, '') as string;
+						const sourceConversationId = this.getNodeParameter('sourceConversationId', i, '') as string;
 						const sourceKey = this.getNodeParameter('sourceKey', i, '') as string;
 						const conversationTypeKey = this.getNodeParameter('conversationTypeKey', i, '') as string;
 						const teamId = this.getNodeParameter('teamId', i, '') as string;
@@ -1168,6 +1184,7 @@ export class TukiMate implements INodeType {
 						if (title) body.title = title;
 						if (durationMinutes !== undefined) body.durationMinutes = durationMinutes;
 						if (transcript) body.transcript = transcript;
+						if (sourceConversationId) body.sourceConversationId = sourceConversationId;
 						if (sourceKey) body.sourceKey = sourceKey;
 						if (conversationTypeKey) body.conversationTypeKey = conversationTypeKey;
 						if (teamId) body.team_id = teamId;
