@@ -20,6 +20,11 @@ const RESOURCES = {
 	SOURCE: 'source',
 	CONVERSATION_TYPE: 'conversationType',
 	TAG: 'tag',
+	TAG_DEFINITION: 'tagDefinition',
+	CATEGORY: 'category',
+	ANALYSIS: 'analysis',
+	OPPORTUNITY: 'opportunity',
+	USAGE: 'usage',
 };
 
 // Operation definitions
@@ -259,6 +264,11 @@ export class TukiMate implements INodeType {
 					{ name: 'Source', value: RESOURCES.SOURCE },
 					{ name: 'Conversation Type', value: RESOURCES.CONVERSATION_TYPE },
 					{ name: 'Tag', value: RESOURCES.TAG },
+					{ name: 'Tag Definition', value: RESOURCES.TAG_DEFINITION },
+					{ name: 'Category', value: RESOURCES.CATEGORY },
+					{ name: 'Analysis', value: RESOURCES.ANALYSIS },
+					{ name: 'Usage', value: RESOURCES.USAGE },
+					{ name: 'Opportunity', value: RESOURCES.OPPORTUNITY },
 				],
 				default: RESOURCES.CONVERSATION,
 			},
@@ -1544,6 +1554,175 @@ export class TukiMate implements INodeType {
 				default: '',
 				description: 'The ID of the conversation to get tags from',
 			},
+
+			// ==================== CATEGORY ====================
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+					},
+				},
+				options: [
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of categories' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single category' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new category' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a category' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a category' },
+				],
+				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Category ID',
+				name: 'categoryId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE, OPERATIONS.DELETE],
+					},
+				},
+				default: '',
+				description: 'The ID of the category',
+			},
+			{
+				displayName: 'Key',
+				name: 'categoryKey',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+						operation: [OPERATIONS.CREATE],
+					},
+				},
+				default: '',
+				description: 'Unique key for the category (lowercase alphanumeric)',
+			},
+			{
+				displayName: 'Label',
+				name: 'categoryLabel',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Display label for the category',
+			},
+			{
+				displayName: 'Active',
+				name: 'categoryActive',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: true,
+				description: 'Whether the category is active',
+			},
+
+			// ==================== ANALYSIS JOB ====================
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS_JOB],
+					},
+				},
+				options: [
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of analysis jobs' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single analysis job' },
+				],
+				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Job ID',
+				name: 'jobId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS_JOB],
+						operation: [OPERATIONS.GET],
+					},
+				},
+				default: '',
+				description: 'The ID of the analysis job',
+			},
+			{
+				displayName: 'Status Filter',
+				name: 'jobStatus',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS_JOB],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Queued', value: 'QUEUED' },
+					{ name: 'Processing', value: 'PROCESSING' },
+					{ name: 'Completed', value: 'COMPLETED' },
+					{ name: 'Failed', value: 'FAILED' },
+				],
+				default: '',
+				description: 'Filter by job status',
+			},
+			{
+				displayName: 'Page',
+				name: 'jobPage',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS_JOB],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: 1,
+				description: 'Page number',
+			},
+			{
+				displayName: 'Page Size',
+				name: 'jobPageSize',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS_JOB],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: 20,
+				description: 'Results per page',
+			},
+
+			// ==================== USAGE ====================
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.USAGE],
+					},
+				},
+				options: [
+					{ name: 'Get Stats', value: 'getStats', description: 'Get usage statistics' },
+				],
+				default: 'getStats',
+			},
 		],
 	};
 
@@ -1986,6 +2165,47 @@ export class TukiMate implements INodeType {
 					else if (operation === OPERATIONS.DELETE) {
 						const tagId = this.getNodeParameter('tagId', i) as string;
 						responseData = await tukiMateRequest.call(this, 'DELETE', `/tags/${tagId}`);
+					}
+				}
+
+				// ==================== CATEGORY ====================
+				else if (resource === RESOURCES.CATEGORY) {
+					if (operation === OPERATIONS.LIST) {
+						responseData = await tukiMateRequest.call(this, 'GET', '/categories');
+					}
+					else if (operation === OPERATIONS.GET) {
+						const categoryId = this.getNodeParameter('categoryId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'GET', `/categories/${categoryId}`);
+					}
+					else if (operation === OPERATIONS.CREATE) {
+						const categoryKey = this.getNodeParameter('categoryKey', i) as string;
+						const categoryLabel = this.getNodeParameter('categoryLabel', i) as string;
+						const categoryActive = this.getNodeParameter('categoryActive', i, true) as boolean;
+
+						const body: any = { key: categoryKey, label: categoryLabel, active: categoryActive };
+						responseData = await tukiMateRequest.call(this, 'POST', '/categories', body);
+					}
+					else if (operation === OPERATIONS.UPDATE) {
+						const categoryId = this.getNodeParameter('categoryId', i) as string;
+						const categoryLabel = this.getNodeParameter('categoryLabel', i, '') as string;
+						const categoryActive = this.getNodeParameter('categoryActive', i, undefined) as boolean | undefined;
+
+						const body: any = {};
+						if (categoryLabel) body.label = categoryLabel;
+						if (categoryActive !== undefined) body.active = categoryActive;
+
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/categories/${categoryId}`, body);
+					}
+					else if (operation === OPERATIONS.DELETE) {
+						const categoryId = this.getNodeParameter('categoryId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'DELETE', `/categories/${categoryId}`);
+					}
+				}
+
+				// ==================== USAGE ====================
+				else if (resource === RESOURCES.USAGE) {
+					if (operation === 'getStats') {
+						responseData = await tukiMateRequest.call(this, 'GET', '/usage/stats');
 					}
 				}
 
