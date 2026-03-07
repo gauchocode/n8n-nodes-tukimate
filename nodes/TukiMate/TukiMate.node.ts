@@ -1727,7 +1727,7 @@ export class TukiMate implements INodeType {
 				description: 'Whether the category is active',
 			},
 
-			// ==================== ANALYSIS JOB ====================
+			// ==================== ANALYSIS ====================
 			{
 				displayName: 'Operation',
 				name: 'operation',
@@ -1735,74 +1735,87 @@ export class TukiMate implements INodeType {
 				noDataExpression: true,
 				displayOptions: {
 					show: {
-						resource: [RESOURCES.ANALYSIS_JOB],
+						resource: [RESOURCES.ANALYSIS],
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of analysis jobs' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single analysis job' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of analyses' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single analysis' },
 				],
 				default: OPERATIONS.LIST,
 			},
 			{
-				displayName: 'Job ID',
-				name: 'jobId',
+				displayName: 'Analysis ID',
+				name: 'analysisId',
 				type: 'string',
 				required: true,
 				displayOptions: {
 					show: {
-						resource: [RESOURCES.ANALYSIS_JOB],
+						resource: [RESOURCES.ANALYSIS],
 						operation: [OPERATIONS.GET],
 					},
 				},
 				default: '',
-				description: 'The ID of the analysis job',
+				description: 'The ID of the analysis',
+			},
+			{
+				displayName: 'Conversation ID Filter',
+				name: 'analysisConversationId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by conversation ID',
 			},
 			{
 				displayName: 'Status Filter',
-				name: 'jobStatus',
+				name: 'analysisStatus',
 				type: 'options',
 				displayOptions: {
 					show: {
-						resource: [RESOURCES.ANALYSIS_JOB],
+						resource: [RESOURCES.ANALYSIS],
 						operation: [OPERATIONS.LIST],
 					},
 				},
 				options: [
 					{ name: 'All', value: '' },
-					{ name: 'Queued', value: 'QUEUED' },
+					{ name: 'Pending', value: 'PENDING' },
 					{ name: 'Processing', value: 'PROCESSING' },
 					{ name: 'Completed', value: 'COMPLETED' },
 					{ name: 'Failed', value: 'FAILED' },
 				],
 				default: '',
-				description: 'Filter by job status',
+				description: 'Filter by analysis status',
 			},
 			{
-				displayName: 'Page',
-				name: 'jobPage',
+				displayName: 'Limit',
+				name: 'analysisLimit',
 				type: 'number',
 				displayOptions: {
 					show: {
-						resource: [RESOURCES.ANALYSIS_JOB],
+						resource: [RESOURCES.ANALYSIS],
 						operation: [OPERATIONS.LIST],
 					},
 				},
-				default: 1,
-				description: 'Page number',
+				default: 50,
+				description: 'Max number of results',
 			},
 			{
-				displayName: 'Page Size',
-				name: 'jobPageSize',
+				displayName: 'Offset',
+				name: 'analysisOffset',
 				type: 'number',
 				displayOptions: {
 					show: {
-						resource: [RESOURCES.ANALYSIS_JOB],
+						resource: [RESOURCES.ANALYSIS],
 						operation: [OPERATIONS.LIST],
 					},
 				},
-				default: 20,
-				description: 'Results per page',
+				default: 0,
+				description: 'Number of results to skip',
 			},
 
 			// ==================== USAGE ====================
@@ -2326,6 +2339,24 @@ export class TukiMate implements INodeType {
 				else if (resource === RESOURCES.USAGE) {
 					if (operation === 'getStats') {
 						responseData = await tukiMateRequest.call(this, 'GET', '/usage/stats');
+					}
+				}
+
+				// ==================== ANALYSIS JOB ====================
+				else if (resource === RESOURCES.ANALYSIS_JOB) {
+					if (operation === OPERATIONS.LIST) {
+						const jobStatus = this.getNodeParameter('jobStatus', i, '') as string;
+						const jobPage = this.getNodeParameter('jobPage', i, 1) as number;
+						const jobPageSize = this.getNodeParameter('jobPageSize', i, 20) as number;
+
+						const query: Record<string, string | number> = { page: jobPage, pageSize: jobPageSize };
+						if (jobStatus) query.status = jobStatus;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/analysis-jobs', undefined, query);
+					}
+					else if (operation === OPERATIONS.GET) {
+						const jobId = this.getNodeParameter('jobId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'GET', `/analysis-jobs/${jobId}`);
 					}
 				}
 
