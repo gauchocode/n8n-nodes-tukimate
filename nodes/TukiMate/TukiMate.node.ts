@@ -28,6 +28,7 @@ const OPERATIONS = {
 	GET: 'get',
 	CREATE: 'create',
 	UPDATE: 'update',
+	DELETE: 'delete',
 };
 
 // Helper to make API requests
@@ -762,6 +763,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single contact' },
 					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new contact' },
 					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a contact' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a contact' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -773,7 +775,7 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.GET, OPERATIONS.UPDATE],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE, OPERATIONS.DELETE],
 					},
 				},
 				default: '',
@@ -993,6 +995,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single team' },
 					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new team' },
 					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a team' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a team' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1004,7 +1007,7 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.TEAM],
-						operation: [OPERATIONS.GET, OPERATIONS.UPDATE],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE, OPERATIONS.DELETE],
 					},
 				},
 				default: '',
@@ -1066,6 +1069,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single project' },
 					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new project' },
 					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a project' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a project' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1096,7 +1100,7 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.PROJECT],
-						operation: [OPERATIONS.GET, OPERATIONS.UPDATE],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE, OPERATIONS.DELETE],
 					},
 				},
 				default: '',
@@ -1163,6 +1167,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single client' },
 					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new client' },
 					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a client' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a client' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1279,7 +1284,7 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CLIENT],
-						operation: [OPERATIONS.GET, OPERATIONS.UPDATE],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE, OPERATIONS.DELETE],
 					},
 				},
 				default: '',
@@ -1728,6 +1733,10 @@ export class TukiMate implements INodeType {
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/contacts/${contactId}`, body);
 					}
+					else if (operation === OPERATIONS.DELETE) {
+						const contactId = this.getNodeParameter('contactId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'DELETE', `/contacts/${contactId}`);
+					}
 				}
 
 				// ==================== TEAM ====================
@@ -1762,6 +1771,10 @@ export class TukiMate implements INodeType {
 						if (color) body.color = color;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/teams/${teamId}`, body);
+					}
+					else if (operation === OPERATIONS.DELETE) {
+						const teamId = this.getNodeParameter('teamId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'DELETE', `/teams/${teamId}`);
 					}
 				}
 
@@ -1802,6 +1815,10 @@ export class TukiMate implements INodeType {
 						if (status) body.status = status;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/projects/${projectId}`, body);
+					}
+					else if (operation === OPERATIONS.DELETE) {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'DELETE', `/projects/${projectId}`);
 					}
 				}
 
@@ -1864,6 +1881,10 @@ export class TukiMate implements INodeType {
 						if (status) body.status = status;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/clients/${clientId}`, body);
+					}
+					else if (operation === OPERATIONS.DELETE) {
+						const clientId = this.getNodeParameter('clientId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'DELETE', `/clients/${clientId}`);
 					}
 				}
 
