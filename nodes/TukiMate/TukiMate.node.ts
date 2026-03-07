@@ -399,6 +399,147 @@ export class TukiMate implements INodeType {
 				description: 'Number of results to skip',
 			},
 
+			// Conversation List - New Filters
+			{
+				displayName: 'Date From',
+				name: 'dateFrom',
+				type: 'dateTime',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter conversations from this date',
+			},
+			{
+				displayName: 'Date To',
+				name: 'dateTo',
+				type: 'dateTime',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter conversations to this date',
+			},
+			{
+				displayName: 'Participant',
+				name: 'participant',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by participant name',
+			},
+			{
+				displayName: 'Contact ID',
+				name: 'contactIdFilter',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by contact ID',
+			},
+			{
+				displayName: 'Category',
+				name: 'category',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by category ID',
+			},
+			{
+				displayName: 'Type',
+				name: 'conversationTypeFilter',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by conversation type key',
+			},
+			{
+				displayName: 'Has Analyses',
+				name: 'hasAnalyses',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: false,
+				description: 'Filter by whether conversation has analyses',
+			},
+			{
+				displayName: 'Source Key',
+				name: 'sourceKeyFilter',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by source key',
+			},
+			{
+				displayName: 'Order By',
+				name: 'orderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Date Time', value: 'date_time' },
+					{ name: 'Title', value: 'title' },
+					{ name: 'Created At', value: 'created_at' },
+				],
+				default: 'date_time',
+				description: 'Field to order results by',
+			},
+			{
+				displayName: 'Order',
+				name: 'order',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
+			},
+
 			// Conversation: Get by ID
 			{
 				displayName: 'Conversation ID',
@@ -1118,13 +1259,35 @@ export class TukiMate implements INodeType {
 						const clientId = this.getNodeParameter('clientId', i, '') as string;
 						const limit = this.getNodeParameter('limit', i, 10) as number;
 						const offset = this.getNodeParameter('offset', i, 0) as number;
+						// NEW FILTERS
+						const dateFrom = this.getNodeParameter('dateFrom', i, '') as string;
+						const dateTo = this.getNodeParameter('dateTo', i, '') as string;
+						const participant = this.getNodeParameter('participant', i, '') as string;
+						const contactIdFilter = this.getNodeParameter('contactIdFilter', i, '') as string;
+						const category = this.getNodeParameter('category', i, '') as string;
+						const conversationTypeFilter = this.getNodeParameter('conversationTypeFilter', i, '') as string;
+						const hasAnalyses = this.getNodeParameter('hasAnalyses', i, false) as boolean;
+						const sourceKeyFilter = this.getNodeParameter('sourceKeyFilter', i, '') as string;
+						const orderBy = this.getNodeParameter('orderBy', i, 'date_time') as string;
+						const order = this.getNodeParameter('order', i, 'desc') as string;
 
-						const query: Record<string, string | number> = { limit, offset };
+						const query: Record<string, string | number | boolean> = { limit, offset };
 						if (search) query.q = search;
 						if (externalMeetingId) query.external_meeting_id = externalMeetingId;
 						if (teamId) query.team = teamId;
 						if (projectId) query.project = projectId;
 						if (clientId) query.client = clientId;
+						// NEW FILTERS
+						if (dateFrom) query.dateFrom = dateFrom;
+						if (dateTo) query.dateTo = dateTo;
+						if (participant) query.participant = participant;
+						if (contactIdFilter) query.contactId = contactIdFilter;
+						if (category) query.category = category;
+						if (conversationTypeFilter) query.type = conversationTypeFilter;
+						if (hasAnalyses) query.hasAnalyses = hasAnalyses;
+						if (sourceKeyFilter) query.sourceKey = sourceKeyFilter;
+						if (orderBy) query.orderBy = orderBy;
+						if (order) query.order = order;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/conversations', undefined, query);
 					}
