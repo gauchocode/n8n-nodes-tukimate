@@ -629,6 +629,48 @@ export class TukiMate implements INodeType {
 				description: 'External conversation ID for deduplication (e.g., Zoom meeting ID)',
 			},
 			{
+				displayName: 'Language',
+				name: 'language',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: 'en',
+				description: 'Language code (e.g., en, es, pt)',
+			},
+			{
+				displayName: 'Tags',
+				name: 'conversationTags',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Comma-separated tags',
+			},
+			{
+				displayName: 'Overview',
+				name: 'overview',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Overview or summary of the conversation',
+				typeOptions: {
+					rows: 4,
+				},
+			},
+			{
 				displayName: 'Source',
 				name: 'sourceKey',
 				type: 'options',
@@ -1512,6 +1554,9 @@ export class TukiMate implements INodeType {
 						const clientId = this.getNodeParameter('clientId', i, '') as string;
 						const description = this.getNodeParameter('description', i, '') as string;
 						const participantsData = this.getNodeParameter('participants', i, {}) as any;
+						const language = this.getNodeParameter('language', i, 'en') as string;
+						const conversationTags = this.getNodeParameter('conversationTags', i, '') as string;
+						const overview = this.getNodeParameter('overview', i, '') as string;
 
 						const body: any = {
 							title,
@@ -1530,6 +1575,9 @@ export class TukiMate implements INodeType {
 						if (participantsData.participant) {
 							body.participants = participantsData.participant;
 						}
+						if (language) body.language = language;
+						if (conversationTags) body.tags = conversationTags.split(',').map(t => t.trim());
+						if (overview) body.overview = overview;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/conversations', body);
 					}
@@ -1546,6 +1594,9 @@ export class TukiMate implements INodeType {
 						const clientId = this.getNodeParameter('clientId', i, '') as string;
 						const description = this.getNodeParameter('description', i, '') as string;
 						const participantsData = this.getNodeParameter('participants', i, {}) as any;
+						const language = this.getNodeParameter('language', i, 'en') as string;
+						const conversationTags = this.getNodeParameter('conversationTags', i, '') as string;
+						const overview = this.getNodeParameter('overview', i, '') as string;
 
 						const body: any = {};
 						if (title) body.title = title;
@@ -1561,6 +1612,9 @@ export class TukiMate implements INodeType {
 						if (participantsData.participant) {
 							body.participants = participantsData.participant;
 						}
+						if (language) body.language = language;
+						if (conversationTags) body.tags = conversationTags.split(',').map(t => t.trim());
+						if (overview) body.overview = overview;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/conversations/${conversationId}`, body);
 					}
