@@ -194,6 +194,8 @@ const SIMPLIFIED_FIELDS: Record<string, string[]> = {
 	project: ['id', 'name', 'description', 'status', 'client_id', 'ai_context'],
 	client: ['id', 'name', 'code', 'type', 'status', 'industry', 'website'],
 	source: ['id', 'key', 'label', 'active'],
+	tag: ['id', 'tag', 'color'],
+	tagDefinition: ['id', 'name', 'color', 'category'],
 };
 
 // Response wrapper keys for list endpoints
@@ -278,21 +280,6 @@ export class TukiMate implements INodeType {
 					{ name: 'Opportunity', value: RESOURCES.OPPORTUNITY },
 				],
 				default: RESOURCES.CONVERSATION,
-			},
-
-			// Simplified output option
-			{
-				displayName: 'Simplified Output',
-				name: 'simplifiedOutput',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION, RESOURCES.CONTACT, RESOURCES.TEAM, RESOURCES.PROJECT, RESOURCES.CLIENT, RESOURCES.SOURCE],
-						operation: [OPERATIONS.LIST, OPERATIONS.GET],
-					},
-				},
-				default: false,
-				description: 'Return only essential fields (id, name, description, etc.) and exclude internal fields like tenant_id',
 			},
 
 			// ==================== CONVERSATION ====================
@@ -2045,6 +2032,21 @@ export class TukiMate implements INodeType {
 				default: 0,
 				description: 'Number of results to skip',
 			},
+
+			// ==================== SIMPLIFIED OUTPUT (common option) ====================
+			{
+				displayName: 'Simplified Output',
+				name: 'simplifiedOutput',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION, RESOURCES.CONTACT, RESOURCES.TEAM, RESOURCES.PROJECT, RESOURCES.CLIENT, RESOURCES.SOURCE, RESOURCES.TAG, RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.LIST, OPERATIONS.GET],
+					},
+				},
+				default: false,
+				description: 'Return only essential fields and exclude internal fields like tenant_id, created_at, etc.',
+			},
 		],
 	};
 
@@ -2655,7 +2657,7 @@ export class TukiMate implements INodeType {
 
 					// Check if simplified output is requested
 					const simplifiedOutput = this.getNodeParameter('simplifiedOutput', i, false) as boolean;
-					if (simplifiedOutput && resource !== RESOURCES.CONVERSATION_TYPE && resource !== RESOURCES.TAG) {
+					if (simplifiedOutput && resource !== RESOURCES.CONVERSATION_TYPE) {
 						responseData = simplifyResponse(responseData, resource);
 					}
 
