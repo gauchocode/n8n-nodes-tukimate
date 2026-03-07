@@ -1484,6 +1484,7 @@ export class TukiMate implements INodeType {
 					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of all available tags' },
 					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single tag by ID' },
 					{ name: 'Get Conversation Tags', value: 'getConversationTags', description: 'Get tags for a specific conversation' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a tag' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1495,7 +1496,7 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.TAG],
-						operation: [OPERATIONS.GET],
+						operation: [OPERATIONS.GET, OPERATIONS.DELETE],
 					},
 				},
 				default: '',
@@ -1938,6 +1939,10 @@ export class TukiMate implements INodeType {
 					else if (operation === 'getConversationTags') {
 						const conversationId = this.getNodeParameter('conversationId', i) as string;
 						responseData = await tukiMateRequest.call(this, 'GET', `/conversations/${conversationId}/tags`);
+					}
+					else if (operation === OPERATIONS.DELETE) {
+						const tagId = this.getNodeParameter('tagId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'DELETE', `/tags/${tagId}`);
 					}
 				}
 
