@@ -29,6 +29,7 @@ const OPERATIONS = {
 	CREATE: 'create',
 	UPDATE: 'update',
 	DELETE: 'delete',
+	ANALYZE: 'analyze',
 };
 
 // Helper to make API requests
@@ -294,6 +295,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single conversation' },
 					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new conversation' },
 					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a conversation' },
+					{ name: 'Analyze', value: OPERATIONS.ANALYZE, description: 'Trigger AI analysis on a conversation' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -550,11 +552,37 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.GET, OPERATIONS.UPDATE],
+						operation: [OPERATIONS.GET, OPERATIONS.UPDATE, OPERATIONS.ANALYZE],
 					},
 				},
 				default: '',
 				description: 'The ID of the conversation',
+			},
+			{
+				displayName: 'Analysis Config IDs',
+				name: 'analysisConfigIds',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.ANALYZE],
+					},
+				},
+				default: '',
+				description: 'Comma-separated analysis config IDs to trigger',
+			},
+			{
+				displayName: 'Force',
+				name: 'forceAnalyze',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.ANALYZE],
+					},
+				},
+				default: false,
+				description: 'Force re-analysis even if already analyzed',
 			},
 
 			// Conversation: Create/Update fields
@@ -1662,6 +1690,21 @@ export class TukiMate implements INodeType {
 						if (overview) body.overview = overview;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/conversations/${conversationId}`, body);
+					}
+					else if (operation === OPERATIONS.ANALYZE) {
+						const conversationId = this.getNodeParameter('conversationId', i) as string;
+						const analysisConfigIds = this.getNodeParameter('analysisConfigIds', i, '') as string;
+						const forceAnalyze = this.getNodeParameter('forceAnalyze', i, false) as boolean;
+
+						const body: any = {};
+						if (analysisConfigIds) {
+							body.analysisConfigIds = analysisConfigIds.split(',').map(id => id.trim());
+						}
+						if (forceAnalyze) {
+							body.force = true;
+						}
+
+						responseData = await tukiMateRequest.call(this, 'POST', `/conversations/${conversationId}/analyze`, body);
 					}
 				}
 
