@@ -25,6 +25,7 @@ const RESOURCES = {
 	ANALYSIS: 'analysis',
 	OPPORTUNITY: 'opportunity',
 	USAGE: 'usage',
+	ANALYSIS_JOB: 'analysisJob',
 };
 
 // Operation definitions
@@ -269,6 +270,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Analysis', value: RESOURCES.ANALYSIS },
 					{ name: 'Usage', value: RESOURCES.USAGE },
 					{ name: 'Opportunity', value: RESOURCES.OPPORTUNITY },
+					{ name: 'Analysis Job', value: RESOURCES.ANALYSIS_JOB },
 				],
 				default: RESOURCES.CONVERSATION,
 			},
@@ -1555,6 +1557,102 @@ export class TukiMate implements INodeType {
 				description: 'The ID of the conversation to get tags from',
 			},
 
+			// ==================== TAG DEFINITION ====================
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+					},
+				},
+				options: [
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of tag definitions' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new tag definition' },
+				],
+				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Category Filter',
+				name: 'tagDefCategory',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Type', value: 'type' },
+					{ name: 'Role', value: 'role' },
+					{ name: 'Status', value: 'status' },
+					{ name: 'Custom', value: 'custom' },
+				],
+				default: '',
+				description: 'Filter by tag category',
+			},
+			{
+				displayName: 'Name',
+				name: 'tagDefName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.CREATE],
+					},
+				},
+				default: '',
+				description: 'Name of the tag',
+			},
+			{
+				displayName: 'Color',
+				name: 'tagDefColor',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.CREATE],
+					},
+				},
+				default: '#3b82f6',
+				description: 'Color hex code',
+			},
+			{
+				displayName: 'Category',
+				name: 'tagDefCategoryCreate',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.CREATE],
+					},
+				},
+				options: [
+					{ name: 'Type', value: 'type' },
+					{ name: 'Role', value: 'role' },
+					{ name: 'Status', value: 'status' },
+					{ name: 'Custom', value: 'custom' },
+				],
+				default: 'custom',
+				description: 'Category of the tag',
+			},
+			{
+				displayName: 'Description',
+				name: 'tagDefDescription',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.CREATE],
+					},
+				},
+				default: '',
+				description: 'Description of the tag',
+			},
+
 			// ==================== CATEGORY ====================
 			{
 				displayName: 'Operation',
@@ -2165,6 +2263,28 @@ export class TukiMate implements INodeType {
 					else if (operation === OPERATIONS.DELETE) {
 						const tagId = this.getNodeParameter('tagId', i) as string;
 						responseData = await tukiMateRequest.call(this, 'DELETE', `/tags/${tagId}`);
+					}
+				}
+
+				// ==================== TAG DEFINITION ====================
+				else if (resource === RESOURCES.TAG_DEFINITION) {
+					if (operation === OPERATIONS.LIST) {
+						const tagDefCategory = this.getNodeParameter('tagDefCategory', i, '') as string;
+						const query: Record<string, string> = {};
+						if (tagDefCategory) query.category = tagDefCategory;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/tag-definitions', undefined, query);
+					}
+					else if (operation === OPERATIONS.CREATE) {
+						const tagDefName = this.getNodeParameter('tagDefName', i) as string;
+						const tagDefColor = this.getNodeParameter('tagDefColor', i, '#3b82f6') as string;
+						const tagDefCategoryCreate = this.getNodeParameter('tagDefCategoryCreate', i, 'custom') as string;
+						const tagDefDescription = this.getNodeParameter('tagDefDescription', i, '') as string;
+
+						const body: any = { name: tagDefName, color: tagDefColor, category: tagDefCategoryCreate };
+						if (tagDefDescription) body.description = tagDefDescription;
+
+						responseData = await tukiMateRequest.call(this, 'POST', '/tag-definitions', body);
 					}
 				}
 
