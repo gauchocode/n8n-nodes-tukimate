@@ -816,6 +816,86 @@ export class TukiMate implements INodeType {
 				description: 'Job title',
 			},
 
+			// Contact List Filters
+			{
+				displayName: 'Search',
+				name: 'contactSearch',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Search in name and email',
+			},
+			{
+				displayName: 'Company',
+				name: 'companyFilter',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by company name',
+			},
+			{
+				displayName: 'Is Active',
+				name: 'isActive',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: true,
+				description: 'Filter by active status',
+			},
+			{
+				displayName: 'Tags',
+				name: 'tagsFilter',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by comma-separated tags',
+			},
+			{
+				displayName: 'Limit',
+				name: 'contactLimit',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: 100,
+				description: 'Max number of results',
+			},
+			{
+				displayName: 'Offset',
+				name: 'contactOffset',
+				type: 'number',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: 0,
+				description: 'Number of results to skip',
+			},
+
 			// ==================== TEAM ====================
 			{
 				displayName: 'Operation',
@@ -1365,7 +1445,20 @@ export class TukiMate implements INodeType {
 				// ==================== CONTACT ====================
 				else if (resource === RESOURCES.CONTACT) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/contacts');
+						const contactSearch = this.getNodeParameter('contactSearch', i, '') as string;
+						const companyFilter = this.getNodeParameter('companyFilter', i, '') as string;
+						const isActive = this.getNodeParameter('isActive', i, true) as boolean;
+						const tagsFilter = this.getNodeParameter('tagsFilter', i, '') as string;
+						const contactLimit = this.getNodeParameter('contactLimit', i, 100) as number;
+						const contactOffset = this.getNodeParameter('contactOffset', i, 0) as number;
+
+						const query: Record<string, string | number | boolean> = { limit: contactLimit, offset: contactOffset };
+						if (contactSearch) query.search = contactSearch;
+						if (companyFilter) query.company = companyFilter;
+						if (isActive !== undefined) query.is_active = isActive;
+						if (tagsFilter) query.tags = tagsFilter;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/contacts', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const contactId = this.getNodeParameter('contactId', i) as string;
