@@ -33,7 +33,7 @@ const OPERATIONS = {
 // Helper to make API requests
 async function tukiMateRequest(
 	this: IExecuteFunctions,
-	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 	endpoint: string,
 	body?: object,
 	query?: Record<string, string | number | boolean>,
@@ -59,7 +59,7 @@ async function tukiMateRequest(
 		},
 	};
 
-	if (body && (method === 'POST' || method === 'PUT')) {
+	if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
 		options.body = JSON.stringify(body);
 	}
 
@@ -1178,7 +1178,7 @@ export class TukiMate implements INodeType {
 							body.participants = participantsData.participant;
 						}
 
-						responseData = await tukiMateRequest.call(this, 'PUT', `/conversations/${conversationId}`, body);
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/conversations/${conversationId}`, body);
 					}
 				}
 
@@ -1224,7 +1224,7 @@ export class TukiMate implements INodeType {
 						if (company) body.company = company;
 						if (jobTitle) body.job_title = jobTitle;
 
-						responseData = await tukiMateRequest.call(this, 'PUT', `/contacts/${contactId}`, body);
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/contacts/${contactId}`, body);
 					}
 				}
 
@@ -1259,7 +1259,7 @@ export class TukiMate implements INodeType {
 						if (description) body.description = description;
 						if (color) body.color = color;
 
-						responseData = await tukiMateRequest.call(this, 'PUT', `/teams/${teamId}`, body);
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/teams/${teamId}`, body);
 					}
 				}
 
@@ -1294,7 +1294,7 @@ export class TukiMate implements INodeType {
 						if (description) body.description = description;
 						if (status) body.status = status;
 
-						responseData = await tukiMateRequest.call(this, 'PUT', `/projects/${projectId}`, body);
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/projects/${projectId}`, body);
 					}
 				}
 
@@ -1341,7 +1341,7 @@ export class TukiMate implements INodeType {
 						if (type) body.type = type;
 						if (status) body.status = status;
 
-						responseData = await tukiMateRequest.call(this, 'PUT', `/clients/${clientId}`, body);
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/clients/${clientId}`, body);
 					}
 				}
 
@@ -1372,7 +1372,7 @@ export class TukiMate implements INodeType {
 						if (label) body.label = label;
 						if (active !== undefined) body.active = active;
 
-						responseData = await tukiMateRequest.call(this, 'PUT', `/sources/${sourceId}`, body);
+						responseData = await tukiMateRequest.call(this, 'PATCH', `/sources/${sourceId}`, body);
 					}
 				}
 
