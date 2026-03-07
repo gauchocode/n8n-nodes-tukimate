@@ -1038,9 +1038,24 @@ export class TukiMate implements INodeType {
 				},
 				options: [
 					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of all available tags' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get tags for a conversation' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single tag by ID' },
+					{ name: 'Get Conversation Tags', value: 'getConversationTags', description: 'Get tags for a specific conversation' },
 				],
 				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Tag ID',
+				name: 'tagId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG],
+						operation: [OPERATIONS.GET],
+					},
+				},
+				default: '',
+				description: 'The ID of the tag to retrieve',
 			},
 			{
 				displayName: 'Conversation ID',
@@ -1050,7 +1065,7 @@ export class TukiMate implements INodeType {
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.TAG],
-						operation: [OPERATIONS.GET],
+						operation: ['getConversationTags'],
 					},
 				},
 				default: '',
@@ -1374,6 +1389,10 @@ export class TukiMate implements INodeType {
 						responseData = await tukiMateRequest.call(this, 'GET', '/tags');
 					}
 					else if (operation === OPERATIONS.GET) {
+						const tagId = this.getNodeParameter('tagId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'GET', `/tags/${tagId}`);
+					}
+					else if (operation === 'getConversationTags') {
 						const conversationId = this.getNodeParameter('conversationId', i) as string;
 						responseData = await tukiMateRequest.call(this, 'GET', `/conversations/${conversationId}/tags`);
 					}
