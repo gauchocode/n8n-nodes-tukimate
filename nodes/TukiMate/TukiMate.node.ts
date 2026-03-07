@@ -1202,7 +1202,7 @@ export class TukiMate implements INodeType {
 						const body: any = { firstName, lastName };
 						if (email) body.email = email;
 						if (phone) body.phone = phone;
-						if (company) body.company = company;
+						if (company) body.companyName = company;
 						if (jobTitle) body.job_title = jobTitle;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/contacts', body);
@@ -1221,7 +1221,7 @@ export class TukiMate implements INodeType {
 						if (lastName) body.lastName = lastName;
 						if (email) body.email = email;
 						if (phone) body.phone = phone;
-						if (company) body.company = company;
+						if (company) body.companyName = company;
 						if (jobTitle) body.job_title = jobTitle;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/contacts/${contactId}`, body);
