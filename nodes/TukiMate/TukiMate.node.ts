@@ -25,7 +25,6 @@ const RESOURCES = {
 	ANALYSIS: 'analysis',
 	OPPORTUNITY: 'opportunity',
 	USAGE: 'usage',
-	ANALYSIS_JOB: 'analysisJob',
 };
 
 // Operation definitions
@@ -270,7 +269,6 @@ export class TukiMate implements INodeType {
 					{ name: 'Analysis', value: RESOURCES.ANALYSIS },
 					{ name: 'Usage', value: RESOURCES.USAGE },
 					{ name: 'Opportunity', value: RESOURCES.OPPORTUNITY },
-					{ name: 'Analysis Job', value: RESOURCES.ANALYSIS_JOB },
 				],
 				default: RESOURCES.CONVERSATION,
 			},
@@ -2342,21 +2340,23 @@ export class TukiMate implements INodeType {
 					}
 				}
 
-				// ==================== ANALYSIS JOB ====================
-				else if (resource === RESOURCES.ANALYSIS_JOB) {
+				// ==================== ANALYSIS ====================
+				else if (resource === RESOURCES.ANALYSIS) {
 					if (operation === OPERATIONS.LIST) {
-						const jobStatus = this.getNodeParameter('jobStatus', i, '') as string;
-						const jobPage = this.getNodeParameter('jobPage', i, 1) as number;
-						const jobPageSize = this.getNodeParameter('jobPageSize', i, 20) as number;
+						const analysisConversationId = this.getNodeParameter('analysisConversationId', i, '') as string;
+						const analysisStatus = this.getNodeParameter('analysisStatus', i, '') as string;
+						const analysisLimit = this.getNodeParameter('analysisLimit', i, 50) as number;
+						const analysisOffset = this.getNodeParameter('analysisOffset', i, 0) as number;
 
-						const query: Record<string, string | number> = { page: jobPage, pageSize: jobPageSize };
-						if (jobStatus) query.status = jobStatus;
+						const query: Record<string, string | number> = { limit: analysisLimit, offset: analysisOffset };
+						if (analysisConversationId) query.conversationId = analysisConversationId;
+						if (analysisStatus) query.status = analysisStatus;
 
-						responseData = await tukiMateRequest.call(this, 'GET', '/analysis-jobs', undefined, query);
+						responseData = await tukiMateRequest.call(this, 'GET', '/analyses', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
-						const jobId = this.getNodeParameter('jobId', i) as string;
-						responseData = await tukiMateRequest.call(this, 'GET', `/analysis-jobs/${jobId}`);
+						const analysisId = this.getNodeParameter('analysisId', i) as string;
+						responseData = await tukiMateRequest.call(this, 'GET', `/analyses/${analysisId}`);
 					}
 				}
 
