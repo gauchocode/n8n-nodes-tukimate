@@ -186,14 +186,21 @@ async function getConversationTypeOptions(this: ILoadOptionsFunctions): Promise<
 	}));
 }
 
-// Fields to keep for simplified output per resource
+// Fields to keep for simplified output per resource (using API field names - snake_case)
 const SIMPLIFIED_FIELDS: Record<string, string[]> = {
-	conversation: ['id', 'title', 'description', 'dateTime', 'durationMinutes', 'status', 'team_id', 'project_id', 'client_id', 'sourceKey', 'conversationTypeKey', 'ai_context', 'sentiment'],
-	contact: ['id', 'firstName', 'lastName', 'email', 'phone', 'company', 'job_title'],
+	conversation: ['id', 'title', 'description', 'date_time', 'duration_minutes', 'status', 'team_id', 'project_id', 'client_id', 'source_key', 'conversation_type_key', 'ai_context', 'sentiment'],
+	contact: ['id', 'first_name', 'last_name', 'email', 'phone', 'company_name', 'job_title'],
 	team: ['id', 'name', 'description', 'color'],
 	project: ['id', 'name', 'description', 'status', 'client_id', 'ai_context'],
 	client: ['id', 'name', 'code', 'type', 'status', 'industry', 'website'],
 	source: ['id', 'key', 'label', 'active'],
+};
+
+// Response wrapper keys for list endpoints
+const RESPONSE_WRAPPERS: Record<string, string> = {
+	contact: 'contacts',
+	project: 'projects',
+	client: 'clients',
 };
 
 // Fields to always exclude
@@ -2640,6 +2647,12 @@ export class TukiMate implements INodeType {
 
 				// Handle response data
 				if (responseData) {
+					// Extract array from wrapper key if present (e.g., { contacts: [...] } -> [...])
+					const wrapperKey = RESPONSE_WRAPPERS[resource];
+					if (wrapperKey && responseData[wrapperKey] && Array.isArray(responseData[wrapperKey])) {
+						responseData = responseData[wrapperKey];
+					}
+
 					// Check if simplified output is requested
 					const simplifiedOutput = this.getNodeParameter('simplifiedOutput', i, false) as boolean;
 					if (simplifiedOutput && resource !== RESOURCES.CONVERSATION_TYPE && resource !== RESOURCES.TAG) {

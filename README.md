@@ -228,8 +228,8 @@ All List and Get operations include a **Simplified Output** option that returns 
 
 | Resource | Fields |
 |----------|--------|
-| Conversation | id, title, description, dateTime, durationMinutes, status, team_id, project_id, client_id, sourceKey, conversationTypeKey, ai_context, sentiment |
-| Contact | id, firstName, lastName, email, phone, company, job_title |
+| Conversation | id, title, description, date_time, duration_minutes, status, team_id, project_id, client_id, source_key, conversation_type_key, ai_context, sentiment |
+| Contact | id, first_name, last_name, email, phone, company_name, job_title |
 | Team | id, name, description, color |
 | Project | id, name, description, status, client_id, ai_context |
 | Client | id, name, code, type, status, industry, website |
