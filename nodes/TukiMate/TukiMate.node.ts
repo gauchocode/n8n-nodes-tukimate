@@ -1085,6 +1085,111 @@ export class TukiMate implements INodeType {
 				],
 				default: OPERATIONS.LIST,
 			},
+			// Client List Filters
+			{
+				displayName: 'Type Filter',
+				name: 'clientTypeFilter',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Corporate', value: 'corporate' },
+					{ name: 'Individual', value: 'individual' },
+					{ name: 'Partner', value: 'partner' },
+				],
+				default: '',
+				description: 'Filter by client type',
+			},
+			{
+				displayName: 'Status Filter',
+				name: 'clientStatusFilter',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Active', value: 'active' },
+					{ name: 'Inactive', value: 'inactive' },
+					{ name: 'Prospect', value: 'prospect' },
+				],
+				default: '',
+				description: 'Filter by client status',
+			},
+			{
+				displayName: 'Tier Filter',
+				name: 'clientTierFilter',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'Standard', value: 'standard' },
+					{ name: 'Premium', value: 'premium' },
+					{ name: 'Enterprise', value: 'enterprise' },
+				],
+				default: '',
+				description: 'Filter by client tier',
+			},
+			{
+				displayName: 'Search',
+				name: 'clientSearch',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Search in client name',
+			},
+			{
+				displayName: 'Order By',
+				name: 'clientOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Name', value: 'name' },
+					{ name: 'Created At', value: 'created_at' },
+				],
+				default: 'name',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Order',
+				name: 'clientOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Ascending', value: 'asc' },
+					{ name: 'Descending', value: 'desc' },
+				],
+				default: 'asc',
+				description: 'Sort order',
+			},
 			{
 				displayName: 'Client ID',
 				name: 'clientId',
@@ -1598,7 +1703,22 @@ export class TukiMate implements INodeType {
 				// ==================== CLIENT ====================
 				else if (resource === RESOURCES.CLIENT) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/clients');
+						const clientTypeFilter = this.getNodeParameter('clientTypeFilter', i, '') as string;
+						const clientStatusFilter = this.getNodeParameter('clientStatusFilter', i, '') as string;
+						const clientTierFilter = this.getNodeParameter('clientTierFilter', i, '') as string;
+						const clientSearch = this.getNodeParameter('clientSearch', i, '') as string;
+						const clientOrderBy = this.getNodeParameter('clientOrderBy', i, 'name') as string;
+						const clientOrder = this.getNodeParameter('clientOrder', i, 'asc') as string;
+
+						const query: Record<string, string> = {};
+						if (clientTypeFilter) query.type = clientTypeFilter;
+						if (clientStatusFilter) query.status = clientStatusFilter;
+						if (clientTierFilter) query.tier = clientTierFilter;
+						if (clientSearch) query.search = clientSearch;
+						if (clientOrderBy) query.orderBy = clientOrderBy;
+						if (clientOrder) query.order = clientOrder;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/clients', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const clientId = this.getNodeParameter('clientId', i) as string;
