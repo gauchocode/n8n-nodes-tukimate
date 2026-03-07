@@ -857,6 +857,45 @@ export class TukiMate implements INodeType {
 				default: '',
 				description: 'Job title',
 			},
+			{
+				displayName: 'Identifier',
+				name: 'identifier',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Unique identifier for the contact',
+			},
+			{
+				displayName: 'Department',
+				name: 'department',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Department name',
+			},
+			{
+				displayName: 'Tags',
+				name: 'contactTags',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Comma-separated tags',
+			},
 
 			// Contact List Filters
 			{
@@ -1649,12 +1688,18 @@ export class TukiMate implements INodeType {
 						const phone = this.getNodeParameter('phone', i, '') as string;
 						const company = this.getNodeParameter('company', i, '') as string;
 						const jobTitle = this.getNodeParameter('jobTitle', i, '') as string;
+						const identifier = this.getNodeParameter('identifier', i, '') as string;
+						const department = this.getNodeParameter('department', i, '') as string;
+						const contactTags = this.getNodeParameter('contactTags', i, '') as string;
 
 						const body: any = { firstName, lastName };
 						if (email) body.email = email;
 						if (phone) body.phone = phone;
 						if (company) body.companyName = company;
 						if (jobTitle) body.job_title = jobTitle;
+						if (identifier) body.identifier = identifier;
+						if (department) body.department = department;
+						if (contactTags) body.tags = contactTags.split(',').map(t => t.trim());
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/contacts', body);
 					}
@@ -1666,6 +1711,9 @@ export class TukiMate implements INodeType {
 						const phone = this.getNodeParameter('phone', i, '') as string;
 						const company = this.getNodeParameter('company', i, '') as string;
 						const jobTitle = this.getNodeParameter('jobTitle', i, '') as string;
+						const identifier = this.getNodeParameter('identifier', i, '') as string;
+						const department = this.getNodeParameter('department', i, '') as string;
+						const contactTags = this.getNodeParameter('contactTags', i, '') as string;
 
 						const body: any = {};
 						if (firstName) body.firstName = firstName;
@@ -1674,6 +1722,9 @@ export class TukiMate implements INodeType {
 						if (phone) body.phone = phone;
 						if (company) body.companyName = company;
 						if (jobTitle) body.job_title = jobTitle;
+						if (identifier) body.identifier = identifier;
+						if (department) body.department = department;
+						if (contactTags) body.tags = contactTags.split(',').map(t => t.trim());
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/contacts/${contactId}`, body);
 					}
