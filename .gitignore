@@ -5,3 +5,4 @@ dist/
 .env
 AGENTS.md
 .claude/
+docs/
