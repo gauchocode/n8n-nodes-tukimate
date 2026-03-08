@@ -2095,7 +2095,7 @@ export class TukiMate implements INodeType {
 
 						const query: Record<string, string | number | boolean> = { limit, offset };
 						if (search) query.q = search;
-						if (externalMeetingId) query.sourceMeetingId = externalMeetingId;
+						if (externalMeetingId) query.source_meeting_id = externalMeetingId;
 						if (teamId) query.team = teamId;
 						if (projectId) query.project = projectId;
 						if (clientId) query.client = clientId;
@@ -2105,9 +2105,9 @@ export class TukiMate implements INodeType {
 						if (participant) query.participant = participant;
 						if (contactIdFilter) query.contactId = contactIdFilter;
 						if (category) query.category = category;
-						if (conversationTypeFilter) query.type = conversationTypeFilter;
+						if (conversationTypeFilter) query.conversation_type_key = conversationTypeFilter;
 						if (hasAnalyses) query.hasAnalyses = hasAnalyses;
-						if (sourceKeyFilter) query.sourceKey = sourceKeyFilter;
+						if (sourceKeyFilter) query.source_key = sourceKeyFilter;
 						if (orderBy) query.orderBy = orderBy;
 						if (order) query.order = order;
 
@@ -2136,14 +2136,14 @@ export class TukiMate implements INodeType {
 
 						const body: any = {
 							title,
-							dateTime,
-							durationMinutes,
+							date_time: dateTime,
+							duration_minutes: durationMinutes,
 							transcript,
-							sourceKey: sourceKey || 'api',
-							conversationTypeKey,
+							source_key: sourceKey || 'api',
+							conversation_type_key: conversationTypeKey,
 						};
 
-						if (sourceConversationId) body.sourceConversationId = sourceConversationId;
+						if (sourceConversationId) body.source_meeting_id = sourceConversationId;
 						if (teamId) body.team_id = teamId;
 						if (projectId) body.project_id = projectId;
 						if (clientId) body.client_id = clientId;
@@ -2176,11 +2176,11 @@ export class TukiMate implements INodeType {
 
 						const body: any = {};
 						if (title) body.title = title;
-						if (durationMinutes !== undefined) body.durationMinutes = durationMinutes;
+						if (durationMinutes !== undefined) body.duration_minutes = durationMinutes;
 						if (transcript) body.transcript = transcript;
-						if (sourceConversationId) body.sourceConversationId = sourceConversationId;
-						if (sourceKey) body.sourceKey = sourceKey;
-						if (conversationTypeKey) body.conversationTypeKey = conversationTypeKey;
+						if (sourceConversationId) body.source_meeting_id = sourceConversationId;
+						if (sourceKey) body.source_key = sourceKey;
+						if (conversationTypeKey) body.conversation_type_key = conversationTypeKey;
 						if (teamId) body.team_id = teamId;
 						if (projectId) body.project_id = projectId;
 						if (clientId) body.client_id = clientId;
@@ -2248,7 +2248,7 @@ export class TukiMate implements INodeType {
 						if (email) body.email = email;
 						if (phone) body.phone = phone;
 						if (company) body.companyName = company;
-						if (jobTitle) body.job_title = jobTitle;
+						if (jobTitle) body.jobTitle = jobTitle;
 						if (identifier) body.identifier = identifier;
 						if (department) body.department = department;
 						if (contactTags) body.tags = contactTags.split(',').map(t => t.trim());
@@ -2273,7 +2273,7 @@ export class TukiMate implements INodeType {
 						if (email) body.email = email;
 						if (phone) body.phone = phone;
 						if (company) body.companyName = company;
-						if (jobTitle) body.job_title = jobTitle;
+						if (jobTitle) body.jobTitle = jobTitle;
 						if (identifier) body.identifier = identifier;
 						if (department) body.department = department;
 						if (contactTags) body.tags = contactTags.split(',').map(t => t.trim());
