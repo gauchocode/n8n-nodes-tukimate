@@ -14,8 +14,8 @@ RUN pnpm install
 # Copy source
 COPY . .
 
-# Build
-RUN pnpm build
+# Clean dist and build (ensures fresh compilation)
+RUN rm -rf dist && pnpm build
 
 # Default command
 CMD ["sh"]

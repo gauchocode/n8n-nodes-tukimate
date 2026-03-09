@@ -85,65 +85,81 @@ async function tukiMateRequest(
 
 // Load options helpers
 async function getTeamOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const credentials = await this.getCredentials('tukiMateApi');
-	const apiKey = credentials.apiKey as string;
+	try {
+		const credentials = await this.getCredentials('tukiMateApi');
+		const apiKey = credentials.apiKey as string;
 
-	const response = await this.helpers.request({
-		method: 'GET',
-		url: `${BASE_URL}/teams`,
-		headers: {
-			'Authorization': `Bearer ${apiKey}`,
-		},
-		json: true,
-	});
+		const response = await this.helpers.request({
+			method: 'GET',
+			url: `${BASE_URL}/teams`,
+			headers: {
+				'Authorization': `Bearer ${apiKey}`,
+			},
+			json: true,
+		});
 
-	const teams = Array.isArray(response) ? response : [];
-	return teams.map((team: any) => ({
-		name: team.name,
-		value: team.id,
-	}));
+		// Handle both array response and nested data (API may use 'teams' key)
+		const teams = Array.isArray(response) ? response : (response?.teams || response?.data || []);
+		return teams.map((team: any) => ({
+			name: team.name,
+			value: team.id,
+		}));
+	} catch (error) {
+		console.error('Error loading team options:', error);
+		return [];
+	}
 }
 
 async function getProjectOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const credentials = await this.getCredentials('tukiMateApi');
-	const apiKey = credentials.apiKey as string;
+	try {
+		const credentials = await this.getCredentials('tukiMateApi');
+		const apiKey = credentials.apiKey as string;
 
-	const response = await this.helpers.request({
-		method: 'GET',
-		url: `${BASE_URL}/projects`,
-		headers: {
-			'Authorization': `Bearer ${apiKey}`,
-		},
-		json: true,
-	});
+		const response = await this.helpers.request({
+			method: 'GET',
+			url: `${BASE_URL}/projects`,
+			headers: {
+				'Authorization': `Bearer ${apiKey}`,
+			},
+			json: true,
+		});
 
-	// Handle both array response and nested data
-	const projects = Array.isArray(response) ? response : (response?.data || []);
-	return projects.map((project: any) => ({
-		name: project.name,
-		value: project.id,
-	}));
+		// Handle both array response and nested data (API uses 'projects' key)
+		const projects = Array.isArray(response) ? response : (response?.projects || response?.data || []);
+		return projects.map((project: any) => ({
+			name: project.name,
+			value: project.id,
+		}));
+	} catch (error) {
+		console.error('Error loading project options:', error);
+		return [];
+	}
 }
 
 async function getClientOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const credentials = await this.getCredentials('tukiMateApi');
-	const apiKey = credentials.apiKey as string;
+	try {
+		const credentials = await this.getCredentials('tukiMateApi');
+		const apiKey = credentials.apiKey as string;
 
-	const response = await this.helpers.request({
-		method: 'GET',
-		url: `${BASE_URL}/clients`,
-		headers: {
-			'Authorization': `Bearer ${apiKey}`,
-		},
-		json: true,
-	});
+		const response = await this.helpers.request({
+			method: 'GET',
+			url: `${BASE_URL}/clients`,
+			headers: {
+				'Authorization': `Bearer ${apiKey}`,
+			},
+			json: true,
+		});
 
-	// Handle both array response and nested data
-	const clients = Array.isArray(response) ? response : (response?.data || []);
-	return clients.map((client: any) => ({
-		name: client.name,
-		value: client.id,
-	}));
+		// Handle both array response and nested data (API uses 'clients' key)
+		const clients = Array.isArray(response) ? response : (response?.clients || response?.data || []);
+		return clients.map((client: any) => ({
+			name: client.name,
+			value: client.id,
+		}));
+	} catch (error) {
+		console.error('Error loading client options:', error);
+		return [];
+	}
 }
 
 async function getSourceOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -190,19 +206,26 @@ async function getConversationTypeOptions(this: ILoadOptionsFunctions): Promise<
 const SIMPLIFIED_FIELDS: Record<string, string[]> = {
 	conversation: ['id', 'title', 'description', 'date_time', 'duration_minutes', 'status', 'team_id', 'project_id', 'client_id', 'source_key', 'conversation_type_key', 'ai_context', 'sentiment'],
 	contact: ['id', 'first_name', 'last_name', 'email', 'phone', 'company_name', 'job_title'],
-	team: ['id', 'name', 'description', 'color'],
+	team: ['id', 'name', 'description'],
 	project: ['id', 'name', 'description', 'status', 'client_id', 'ai_context'],
 	client: ['id', 'name', 'code', 'type', 'status', 'industry', 'website'],
 	source: ['id', 'key', 'label', 'active'],
-	tag: ['id', 'tag', 'color'],
-	tagDefinition: ['id', 'name', 'color', 'category'],
+	tag: ['id', 'tag'],
+	tagDefinition: ['id', 'name', 'category'],
+	category: ['id', 'key', 'label', 'active'],
+	opportunity: ['id', 'title', 'type', 'status', 'confidence', 'estimated_value', 'currency', 'description', 'expected_close_date', 'conversation_id'],
+	analysis: ['id', 'conversation_id', 'status', 'type', 'result'],
 };
 
 // Response wrapper keys for list endpoints
 const RESPONSE_WRAPPERS: Record<string, string> = {
+	conversation: 'data',
 	contact: 'contacts',
 	project: 'projects',
 	client: 'clients',
+	category: 'categories',
+	opportunity: 'opportunities',
+	analysis: 'analyses',
 };
 
 // Fields to always exclude
@@ -272,8 +295,7 @@ export class TukiMate implements INodeType {
 					{ name: 'Client', value: RESOURCES.CLIENT },
 					{ name: 'Source', value: RESOURCES.SOURCE },
 					{ name: 'Conversation Type', value: RESOURCES.CONVERSATION_TYPE },
-					{ name: 'Tag', value: RESOURCES.TAG },
-					{ name: 'Tag Definition', value: RESOURCES.TAG_DEFINITION },
+					{ name: 'Tag', value: RESOURCES.TAG_DEFINITION },
 					{ name: 'Category', value: RESOURCES.CATEGORY },
 					{ name: 'Analysis', value: RESOURCES.ANALYSIS },
 					{ name: 'Usage', value: RESOURCES.USAGE },
@@ -317,19 +339,6 @@ export class TukiMate implements INodeType {
 				},
 				default: '',
 				description: 'Search term to filter conversations',
-			},
-			{
-				displayName: 'External Meeting ID',
-				name: 'externalMeetingId',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by external meeting source ID (e.g., Zoom meeting ID, Google Meet ID)',
 			},
 			{
 				displayName: 'Team',
@@ -392,159 +401,115 @@ export class TukiMate implements INodeType {
 				default: 10,
 				description: 'Max number of results',
 			},
-			{
-				displayName: 'Offset',
-				name: 'offset',
-				type: 'number',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: 0,
-				description: 'Number of results to skip',
-			},
 
-			// Conversation List - New Filters
+			// Conversation List - Additional Options (hidden by default)
 			{
-				displayName: 'Date From',
-				name: 'dateFrom',
-				type: 'dateTime',
+				displayName: 'Additional Options',
+				name: 'additionalOptions',
+				type: 'collection',
+				placeholder: 'Add Option',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
 						operation: [OPERATIONS.LIST],
 					},
 				},
-				default: '',
-				description: 'Filter conversations from this date',
-			},
-			{
-				displayName: 'Date To',
-				name: 'dateTo',
-				type: 'dateTime',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter conversations to this date',
-			},
-			{
-				displayName: 'Participant',
-				name: 'participant',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by participant name',
-			},
-			{
-				displayName: 'Contact ID',
-				name: 'contactIdFilter',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by contact ID',
-			},
-			{
-				displayName: 'Category',
-				name: 'category',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by category ID',
-			},
-			{
-				displayName: 'Type',
-				name: 'conversationTypeFilter',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by conversation type key',
-			},
-			{
-				displayName: 'Has Analyses',
-				name: 'hasAnalyses',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: false,
-				description: 'Filter by whether conversation has analyses',
-			},
-			{
-				displayName: 'Source Key',
-				name: 'sourceKeyFilter',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by source key',
-			},
-			{
-				displayName: 'Order By',
-				name: 'orderBy',
-				type: 'options',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
+				default: {},
 				options: [
-					{ name: 'Date Time', value: 'date_time' },
-					{ name: 'Title', value: 'title' },
-					{ name: 'Created At', value: 'created_at' },
-				],
-				default: 'date_time',
-				description: 'Field to order results by',
-			},
-			{
-				displayName: 'Order',
-				name: 'order',
-				type: 'options',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
+					{
+						displayName: 'External Meeting ID',
+						name: 'externalMeetingId',
+						type: 'string',
+						default: '',
+						description: 'Filter by external meeting source ID (e.g., Zoom meeting ID)',
 					},
-				},
-				options: [
-					{ name: 'Descending', value: 'desc' },
-					{ name: 'Ascending', value: 'asc' },
+					{
+						displayName: 'Offset',
+						name: 'offset',
+						type: 'number',
+						default: 0,
+						description: 'Number of results to skip',
+					},
+					{
+						displayName: 'Date From',
+						name: 'dateFrom',
+						type: 'dateTime',
+						default: '',
+						description: 'Filter conversations from this date',
+					},
+					{
+						displayName: 'Date To',
+						name: 'dateTo',
+						type: 'dateTime',
+						default: '',
+						description: 'Filter conversations to this date',
+					},
+					{
+						displayName: 'Participant',
+						name: 'participant',
+						type: 'string',
+						default: '',
+						description: 'Filter by participant name',
+					},
+					{
+						displayName: 'Contact ID',
+						name: 'contactIdFilter',
+						type: 'string',
+						default: '',
+						description: 'Filter by contact ID',
+					},
+					{
+						displayName: 'Category',
+						name: 'category',
+						type: 'string',
+						default: '',
+						description: 'Filter by category ID',
+					},
+					{
+						displayName: 'Type',
+						name: 'conversationTypeFilter',
+						type: 'string',
+						default: '',
+						description: 'Filter by conversation type key',
+					},
+					{
+						displayName: 'Has Analyses',
+						name: 'hasAnalyses',
+						type: 'boolean',
+						default: false,
+						description: 'Filter by whether conversation has analyses',
+					},
+					{
+						displayName: 'Source Key',
+						name: 'sourceKeyFilter',
+						type: 'string',
+						default: '',
+						description: 'Filter by source key',
+					},
+					{
+						displayName: 'Order By',
+						name: 'orderBy',
+						type: 'options',
+						options: [
+							{ name: 'Date Time', value: 'date_time' },
+							{ name: 'Title', value: 'title' },
+							{ name: 'Created At', value: 'created_at' },
+						],
+						default: 'date_time',
+						description: 'Field to order results by',
+					},
+					{
+						displayName: 'Order',
+						name: 'order',
+						type: 'options',
+						options: [
+							{ name: 'Descending', value: 'desc' },
+							{ name: 'Ascending', value: 'asc' },
+						],
+						default: 'desc',
+						description: 'Sort order',
+					},
 				],
-				default: 'desc',
-				description: 'Sort order',
 			},
 
 			// Conversation: Get by ID
@@ -852,83 +817,63 @@ export class TukiMate implements INodeType {
 				default: '',
 				description: 'Email address',
 			},
+			// Contact CREATE/UPDATE - Additional Options
 			{
-				displayName: 'Phone',
-				name: 'phone',
-				type: 'string',
+				displayName: 'Additional Options',
+				name: 'contactAdditionalOptions',
+				type: 'collection',
+				placeholder: 'Add Option',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONTACT],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: '',
-				description: 'Phone number',
-			},
-			{
-				displayName: 'Company',
-				name: 'company',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+				default: {},
+				options: [
+					{
+						displayName: 'Phone',
+						name: 'phone',
+						type: 'string',
+						default: '',
+						description: 'Phone number',
 					},
-				},
-				default: '',
-				description: 'Company name',
-			},
-			{
-				displayName: 'Job Title',
-				name: 'jobTitle',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					{
+						displayName: 'Company',
+						name: 'company',
+						type: 'string',
+						default: '',
+						description: 'Company name',
 					},
-				},
-				default: '',
-				description: 'Job title',
-			},
-			{
-				displayName: 'Identifier',
-				name: 'identifier',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					{
+						displayName: 'Job Title',
+						name: 'jobTitle',
+						type: 'string',
+						default: '',
+						description: 'Job title',
 					},
-				},
-				default: '',
-				description: 'Unique identifier for the contact',
-			},
-			{
-				displayName: 'Department',
-				name: 'department',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					{
+						displayName: 'Identifier',
+						name: 'identifier',
+						type: 'string',
+						default: '',
+						description: 'Unique identifier for the contact',
 					},
-				},
-				default: '',
-				description: 'Department name',
-			},
-			{
-				displayName: 'Tags',
-				name: 'contactTags',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					{
+						displayName: 'Department',
+						name: 'department',
+						type: 'string',
+						default: '',
+						description: 'Department name',
 					},
-				},
-				default: '',
-				description: 'Comma-separated tags',
+					{
+						displayName: 'Tags',
+						name: 'contactTags',
+						type: 'string',
+						default: '',
+						description: 'Comma-separated tags',
+					},
+				],
 			},
 
 			// Contact List Filters
@@ -946,45 +891,6 @@ export class TukiMate implements INodeType {
 				description: 'Search in name and email',
 			},
 			{
-				displayName: 'Company',
-				name: 'companyFilter',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by company name',
-			},
-			{
-				displayName: 'Is Active',
-				name: 'isActive',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: true,
-				description: 'Filter by active status',
-			},
-			{
-				displayName: 'Tags',
-				name: 'tagsFilter',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONTACT],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: '',
-				description: 'Filter by comma-separated tags',
-			},
-			{
 				displayName: 'Limit',
 				name: 'contactLimit',
 				type: 'number',
@@ -997,18 +903,49 @@ export class TukiMate implements INodeType {
 				default: 100,
 				description: 'Max number of results',
 			},
+			// Contact LIST - Additional Options
 			{
-				displayName: 'Offset',
-				name: 'contactOffset',
-				type: 'number',
+				displayName: 'Additional Options',
+				name: 'contactListAdditionalOptions',
+				type: 'collection',
+				placeholder: 'Add Option',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONTACT],
 						operation: [OPERATIONS.LIST],
 					},
 				},
-				default: 0,
-				description: 'Number of results to skip',
+				default: {},
+				options: [
+					{
+						displayName: 'Company',
+						name: 'companyFilter',
+						type: 'string',
+						default: '',
+						description: 'Filter by company name',
+					},
+					{
+						displayName: 'Is Active',
+						name: 'isActive',
+						type: 'boolean',
+						default: true,
+						description: 'Filter by active status',
+					},
+					{
+						displayName: 'Tags',
+						name: 'tagsFilter',
+						type: 'string',
+						default: '',
+						description: 'Filter by comma-separated tags',
+					},
+					{
+						displayName: 'Offset',
+						name: 'contactOffset',
+						type: 'number',
+						default: 0,
+						description: 'Number of results to skip',
+					},
+				],
 			},
 
 			// ==================== TEAM ====================
@@ -1058,31 +995,35 @@ export class TukiMate implements INodeType {
 				default: '',
 				description: 'Name of the team',
 			},
+			// Team CREATE/UPDATE - Additional Options
 			{
-				displayName: 'Description',
-				name: 'description',
-				type: 'string',
+				displayName: 'Additional Options',
+				name: 'teamAdditionalOptions',
+				type: 'collection',
+				placeholder: 'Add Option',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.TEAM],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: '',
-				description: 'Description of the team',
-			},
-			{
-				displayName: 'Color',
-				name: 'color',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.TEAM],
-						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+				default: {},
+				options: [
+					{
+						displayName: 'Description',
+						name: 'description',
+						type: 'string',
+						default: '',
+						description: 'Description of the team',
 					},
-				},
-				default: '#3b82f6',
-				description: 'Color hex code (e.g., #3b82f6)',
+					{
+						displayName: 'Color',
+						name: 'color',
+						type: 'string',
+						default: '#3b82f6',
+						description: 'Color hex code (e.g., #3b82f6)',
+					},
+				],
 			},
 
 			// ==================== PROJECT ====================
@@ -2075,41 +2016,45 @@ export class TukiMate implements INodeType {
 				if (resource === RESOURCES.CONVERSATION) {
 					if (operation === OPERATIONS.LIST) {
 						const search = this.getNodeParameter('search', i, '') as string;
-						const externalMeetingId = this.getNodeParameter('externalMeetingId', i, '') as string;
 						const teamId = this.getNodeParameter('teamId', i, '') as string;
 						const projectId = this.getNodeParameter('projectId', i, '') as string;
 						const clientId = this.getNodeParameter('clientId', i, '') as string;
 						const limit = this.getNodeParameter('limit', i, 10) as number;
-						const offset = this.getNodeParameter('offset', i, 0) as number;
-						// NEW FILTERS
-						const dateFrom = this.getNodeParameter('dateFrom', i, '') as string;
-						const dateTo = this.getNodeParameter('dateTo', i, '') as string;
-						const participant = this.getNodeParameter('participant', i, '') as string;
-						const contactIdFilter = this.getNodeParameter('contactIdFilter', i, '') as string;
-						const category = this.getNodeParameter('category', i, '') as string;
-						const conversationTypeFilter = this.getNodeParameter('conversationTypeFilter', i, '') as string;
-						const hasAnalyses = this.getNodeParameter('hasAnalyses', i, false) as boolean;
-						const sourceKeyFilter = this.getNodeParameter('sourceKeyFilter', i, '') as string;
-						const orderBy = this.getNodeParameter('orderBy', i, 'date_time') as string;
-						const order = this.getNodeParameter('order', i, 'desc') as string;
 
-						const query: Record<string, string | number | boolean> = { limit, offset };
+						// Additional options
+						const additionalOptions = this.getNodeParameter('additionalOptions', i, {}) as {
+							externalMeetingId?: string;
+							offset?: number;
+							dateFrom?: string;
+							dateTo?: string;
+							participant?: string;
+							contactIdFilter?: string;
+							category?: string;
+							conversationTypeFilter?: string;
+							hasAnalyses?: boolean;
+							sourceKeyFilter?: string;
+							orderBy?: string;
+							order?: string;
+						};
+
+						const query: Record<string, string | number | boolean> = { limit };
 						if (search) query.q = search;
-						if (externalMeetingId) query.source_meeting_id = externalMeetingId;
 						if (teamId) query.team = teamId;
 						if (projectId) query.project = projectId;
 						if (clientId) query.client = clientId;
-						// NEW FILTERS
-						if (dateFrom) query.dateFrom = dateFrom;
-						if (dateTo) query.dateTo = dateTo;
-						if (participant) query.participant = participant;
-						if (contactIdFilter) query.contactId = contactIdFilter;
-						if (category) query.category = category;
-						if (conversationTypeFilter) query.conversation_type_key = conversationTypeFilter;
-						if (hasAnalyses) query.hasAnalyses = hasAnalyses;
-						if (sourceKeyFilter) query.source_key = sourceKeyFilter;
-						if (orderBy) query.orderBy = orderBy;
-						if (order) query.order = order;
+						// Additional options
+						if (additionalOptions.externalMeetingId) query.source_meeting_id = additionalOptions.externalMeetingId;
+						if (additionalOptions.offset !== undefined) query.offset = additionalOptions.offset;
+						if (additionalOptions.dateFrom) query.dateFrom = additionalOptions.dateFrom;
+						if (additionalOptions.dateTo) query.dateTo = additionalOptions.dateTo;
+						if (additionalOptions.participant) query.participant = additionalOptions.participant;
+						if (additionalOptions.contactIdFilter) query.contactId = additionalOptions.contactIdFilter;
+						if (additionalOptions.category) query.category = additionalOptions.category;
+						if (additionalOptions.conversationTypeFilter) query.conversation_type_key = additionalOptions.conversationTypeFilter;
+						if (additionalOptions.hasAnalyses) query.hasAnalyses = additionalOptions.hasAnalyses;
+						if (additionalOptions.sourceKeyFilter) query.source_key = additionalOptions.sourceKeyFilter;
+						if (additionalOptions.orderBy) query.orderBy = additionalOptions.orderBy;
+						if (additionalOptions.order) query.order = additionalOptions.order;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/conversations', undefined, query);
 					}
@@ -2215,17 +2160,22 @@ export class TukiMate implements INodeType {
 				else if (resource === RESOURCES.CONTACT) {
 					if (operation === OPERATIONS.LIST) {
 						const contactSearch = this.getNodeParameter('contactSearch', i, '') as string;
-						const companyFilter = this.getNodeParameter('companyFilter', i, '') as string;
-						const isActive = this.getNodeParameter('isActive', i, true) as boolean;
-						const tagsFilter = this.getNodeParameter('tagsFilter', i, '') as string;
 						const contactLimit = this.getNodeParameter('contactLimit', i, 100) as number;
-						const contactOffset = this.getNodeParameter('contactOffset', i, 0) as number;
 
-						const query: Record<string, string | number | boolean> = { limit: contactLimit, offset: contactOffset };
+						// Additional options
+						const additionalOptions = this.getNodeParameter('contactListAdditionalOptions', i, {}) as {
+							companyFilter?: string;
+							isActive?: boolean;
+							tagsFilter?: string;
+							contactOffset?: number;
+						};
+
+						const query: Record<string, string | number | boolean> = { limit: contactLimit };
 						if (contactSearch) query.search = contactSearch;
-						if (companyFilter) query.company = companyFilter;
-						if (isActive !== undefined) query.is_active = isActive;
-						if (tagsFilter) query.tags = tagsFilter;
+						if (additionalOptions.companyFilter) query.company = additionalOptions.companyFilter;
+						if (additionalOptions.isActive !== undefined) query.is_active = additionalOptions.isActive;
+						if (additionalOptions.tagsFilter) query.tags = additionalOptions.tagsFilter;
+						if (additionalOptions.contactOffset !== undefined) query.offset = additionalOptions.contactOffset;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/contacts', undefined, query);
 					}
@@ -2237,21 +2187,25 @@ export class TukiMate implements INodeType {
 						const firstName = this.getNodeParameter('firstName', i) as string;
 						const lastName = this.getNodeParameter('lastName', i) as string;
 						const email = this.getNodeParameter('email', i, '') as string;
-						const phone = this.getNodeParameter('phone', i, '') as string;
-						const company = this.getNodeParameter('company', i, '') as string;
-						const jobTitle = this.getNodeParameter('jobTitle', i, '') as string;
-						const identifier = this.getNodeParameter('identifier', i, '') as string;
-						const department = this.getNodeParameter('department', i, '') as string;
-						const contactTags = this.getNodeParameter('contactTags', i, '') as string;
 
-						const body: any = { firstName, lastName };
+						// Additional options
+						const additionalOptions = this.getNodeParameter('contactAdditionalOptions', i, {}) as {
+							phone?: string;
+							company?: string;
+							jobTitle?: string;
+							identifier?: string;
+							department?: string;
+							contactTags?: string;
+						};
+
+						const body: any = { first_name: firstName, last_name: lastName };
 						if (email) body.email = email;
-						if (phone) body.phone = phone;
-						if (company) body.companyName = company;
-						if (jobTitle) body.jobTitle = jobTitle;
-						if (identifier) body.identifier = identifier;
-						if (department) body.department = department;
-						if (contactTags) body.tags = contactTags.split(',').map(t => t.trim());
+						if (additionalOptions.phone) body.phone = additionalOptions.phone;
+						if (additionalOptions.company) body.company_name = additionalOptions.company;
+						if (additionalOptions.jobTitle) body.job_title = additionalOptions.jobTitle;
+						if (additionalOptions.identifier) body.identifier = additionalOptions.identifier;
+						if (additionalOptions.department) body.department = additionalOptions.department;
+						if (additionalOptions.contactTags) body.tags = additionalOptions.contactTags.split(',').map((t: string) => t.trim());
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/contacts', body);
 					}
@@ -2260,23 +2214,27 @@ export class TukiMate implements INodeType {
 						const firstName = this.getNodeParameter('firstName', i, '') as string;
 						const lastName = this.getNodeParameter('lastName', i, '') as string;
 						const email = this.getNodeParameter('email', i, '') as string;
-						const phone = this.getNodeParameter('phone', i, '') as string;
-						const company = this.getNodeParameter('company', i, '') as string;
-						const jobTitle = this.getNodeParameter('jobTitle', i, '') as string;
-						const identifier = this.getNodeParameter('identifier', i, '') as string;
-						const department = this.getNodeParameter('department', i, '') as string;
-						const contactTags = this.getNodeParameter('contactTags', i, '') as string;
+
+						// Additional options
+						const additionalOptions = this.getNodeParameter('contactAdditionalOptions', i, {}) as {
+							phone?: string;
+							company?: string;
+							jobTitle?: string;
+							identifier?: string;
+							department?: string;
+							contactTags?: string;
+						};
 
 						const body: any = {};
-						if (firstName) body.firstName = firstName;
-						if (lastName) body.lastName = lastName;
+						if (firstName) body.first_name = firstName;
+						if (lastName) body.last_name = lastName;
 						if (email) body.email = email;
-						if (phone) body.phone = phone;
-						if (company) body.companyName = company;
-						if (jobTitle) body.jobTitle = jobTitle;
-						if (identifier) body.identifier = identifier;
-						if (department) body.department = department;
-						if (contactTags) body.tags = contactTags.split(',').map(t => t.trim());
+						if (additionalOptions.phone) body.phone = additionalOptions.phone;
+						if (additionalOptions.company) body.company_name = additionalOptions.company;
+						if (additionalOptions.jobTitle) body.job_title = additionalOptions.jobTitle;
+						if (additionalOptions.identifier) body.identifier = additionalOptions.identifier;
+						if (additionalOptions.department) body.department = additionalOptions.department;
+						if (additionalOptions.contactTags) body.tags = additionalOptions.contactTags.split(',').map((t: string) => t.trim());
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/contacts/${contactId}`, body);
 					}
@@ -2297,25 +2255,33 @@ export class TukiMate implements INodeType {
 					}
 					else if (operation === OPERATIONS.CREATE) {
 						const name = this.getNodeParameter('name', i) as string;
-						const description = this.getNodeParameter('description', i, '') as string;
-						const color = this.getNodeParameter('color', i, '#3b82f6') as string;
+
+						// Additional options
+						const additionalOptions = this.getNodeParameter('teamAdditionalOptions', i, {}) as {
+							description?: string;
+							color?: string;
+						};
 
 						const body: any = { name };
-						if (description) body.description = description;
-						if (color) body.color = color;
+						if (additionalOptions.description) body.description = additionalOptions.description;
+						if (additionalOptions.color) body.color = additionalOptions.color;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/teams', body);
 					}
 					else if (operation === OPERATIONS.UPDATE) {
 						const teamId = this.getNodeParameter('teamId', i) as string;
 						const name = this.getNodeParameter('name', i, '') as string;
-						const description = this.getNodeParameter('description', i, '') as string;
-						const color = this.getNodeParameter('color', i, '') as string;
+
+						// Additional options
+						const additionalOptions = this.getNodeParameter('teamAdditionalOptions', i, {}) as {
+							description?: string;
+							color?: string;
+						};
 
 						const body: any = {};
 						if (name) body.name = name;
-						if (description) body.description = description;
-						if (color) body.color = color;
+						if (additionalOptions.description) body.description = additionalOptions.description;
+						if (additionalOptions.color) body.color = additionalOptions.color;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/teams/${teamId}`, body);
 					}
