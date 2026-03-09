@@ -204,7 +204,8 @@ async function getConversationTypeOptions(this: ILoadOptionsFunctions): Promise<
 
 // Fields to keep for simplified output per resource (using API field names - snake_case)
 const SIMPLIFIED_FIELDS: Record<string, string[]> = {
-	conversation: ['id', 'title', 'description', 'date_time', 'duration_minutes', 'status', 'team_id', 'project_id', 'client_id', 'source_key', 'conversation_type_key', 'ai_context', 'sentiment'],
+		conversation: ['id', 'title', 'description', 'date_time', 'duration_minutes', 'team_id', 'project_id', 'client_id', 'source_key', 'source_meeting_id', 'conversation_type_key', 'has_analyses'],
+
 	contact: ['id', 'first_name', 'last_name', 'email', 'phone', 'company_name', 'job_title'],
 	team: ['id', 'name', 'description'],
 	project: ['id', 'name', 'description', 'status', 'client_id', 'ai_context'],
@@ -326,6 +327,56 @@ export class TukiMate implements INodeType {
 				default: OPERATIONS.LIST,
 			},
 
+			// Conversation: Team/Client/Project for CREATE and UPDATE
+			{
+				displayName: 'Team',
+				name: 'teamId',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getTeams',
+				},
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Set by team',
+			},
+			{
+				displayName: 'Client',
+				name: 'clientId',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getClients',
+				},
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Set by client',
+			},
+			{
+				displayName: 'Project',
+				name: 'projectId',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getProjects',
+				},
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Set by project',
+			},
+
 			// Conversation: List filters
 			{
 				displayName: 'Search',
@@ -339,67 +390,6 @@ export class TukiMate implements INodeType {
 				},
 				default: '',
 				description: 'Search term to filter conversations',
-			},
-			{
-				displayName: 'Team',
-				name: 'teamId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getTeams',
-				},
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST, OPERATIONS.CREATE, OPERATIONS.UPDATE],
-					},
-				},
-				default: '',
-				description: 'Filter or set by team',
-			},
-			{
-				displayName: 'Client',
-				name: 'clientId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getClients',
-				},
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST, OPERATIONS.CREATE, OPERATIONS.UPDATE],
-					},
-				},
-				default: '',
-				description: 'Filter or set by client',
-			},
-			{
-				displayName: 'Project',
-				name: 'projectId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getProjects',
-				},
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST, OPERATIONS.CREATE, OPERATIONS.UPDATE],
-					},
-				},
-				default: '',
-				description: 'Filter or set by project',
-			},
-			{
-				displayName: 'Limit',
-				name: 'limit',
-				type: 'number',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: 10,
-				description: 'Max number of results',
 			},
 
 			// Conversation List - Additional Options (hidden by default)
@@ -416,6 +406,43 @@ export class TukiMate implements INodeType {
 				},
 				default: {},
 				options: [
+					{
+						displayName: 'Limit',
+						name: 'limit',
+						type: 'number',
+						default: 10,
+						description: 'Max number of results to return',
+					},
+					{
+						displayName: 'Team',
+						name: 'teamId',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getTeams',
+						},
+						default: '',
+						description: 'Filter by team',
+					},
+					{
+						displayName: 'Client',
+						name: 'clientId',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getClients',
+						},
+						default: '',
+						description: 'Filter by client',
+					},
+					{
+						displayName: 'Project',
+						name: 'projectId',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getProjects',
+						},
+						default: '',
+						description: 'Filter by project',
+					},
 					{
 						displayName: 'External Meeting ID',
 						name: 'externalMeetingId',
@@ -2016,13 +2043,13 @@ export class TukiMate implements INodeType {
 				if (resource === RESOURCES.CONVERSATION) {
 					if (operation === OPERATIONS.LIST) {
 						const search = this.getNodeParameter('search', i, '') as string;
-						const teamId = this.getNodeParameter('teamId', i, '') as string;
-						const projectId = this.getNodeParameter('projectId', i, '') as string;
-						const clientId = this.getNodeParameter('clientId', i, '') as string;
-						const limit = this.getNodeParameter('limit', i, 10) as number;
 
-						// Additional options
+						// Additional options (includes Limit, Team, Client, Project filters)
 						const additionalOptions = this.getNodeParameter('additionalOptions', i, {}) as {
+							limit?: number;
+							teamId?: string;
+							clientId?: string;
+							projectId?: string;
 							externalMeetingId?: string;
 							offset?: number;
 							dateFrom?: string;
@@ -2037,13 +2064,14 @@ export class TukiMate implements INodeType {
 							order?: string;
 						};
 
-						const query: Record<string, string | number | boolean> = { limit };
+						const query: Record<string, string | number | boolean> = {};
 						if (search) query.q = search;
-						if (teamId) query.team = teamId;
-						if (projectId) query.project = projectId;
-						if (clientId) query.client = clientId;
-						// Additional options
-						if (additionalOptions.externalMeetingId) query.source_meeting_id = additionalOptions.externalMeetingId;
+						query.limit = additionalOptions.limit ?? 10;
+						// Filters from additional options
+						if (additionalOptions.teamId) query.team = additionalOptions.teamId;
+						if (additionalOptions.clientId) query.client = additionalOptions.clientId;
+						if (additionalOptions.projectId) query.project = additionalOptions.projectId;
+						if (additionalOptions.externalMeetingId) query.sourceMeetingId = additionalOptions.externalMeetingId;
 						if (additionalOptions.offset !== undefined) query.offset = additionalOptions.offset;
 						if (additionalOptions.dateFrom) query.dateFrom = additionalOptions.dateFrom;
 						if (additionalOptions.dateTo) query.dateTo = additionalOptions.dateTo;
