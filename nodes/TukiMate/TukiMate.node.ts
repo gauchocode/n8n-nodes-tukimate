@@ -318,11 +318,11 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of conversations' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single conversation' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new conversation' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a conversation' },
-					{ name: 'Analyze', value: OPERATIONS.ANALYZE, description: 'Trigger AI analysis on a conversation' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of conversations', action: 'List conversations' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single conversation', action: 'Get a conversation' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new conversation', action: 'Create a conversation' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a conversation', action: 'Update a conversation' },
+					{ name: 'Analyze', value: OPERATIONS.ANALYZE, description: 'Trigger AI analysis on a conversation', action: 'Analyze a conversation' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -783,11 +783,11 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of contacts' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single contact' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new contact' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a contact' },
-					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a contact' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of contacts', action: 'List contacts' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single contact', action: 'Get a contact' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new contact', action: 'Create a contact' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a contact', action: 'Update a contact' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a contact', action: 'Delete a contact' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -987,11 +987,11 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of teams' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single team' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new team' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a team' },
-					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a team' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of teams', action: 'List teams' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single team', action: 'Get a team' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new team', action: 'Create a team' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a team', action: 'Update a team' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a team', action: 'Delete a team' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1065,11 +1065,11 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of projects' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single project' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new project' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a project' },
-					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a project' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of projects', action: 'List projects' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single project', action: 'Get a project' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new project', action: 'Create a project' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a project', action: 'Update a project' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a project', action: 'Delete a project' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1163,15 +1163,33 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of clients' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single client' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new client' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a client' },
-					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a client' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of clients', action: 'List clients' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single client', action: 'Get a client' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new client', action: 'Create a client' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a client', action: 'Update a client' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a client', action: 'Delete a client' },
 				],
 				default: OPERATIONS.LIST,
 			},
 			// Client List Filters
+			// Type Filter with List/Id mode
+			{
+				displayName: 'Type Filter Mode',
+				name: 'clientTypeFilterMode',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'From List', value: 'list' },
+					{ name: 'Manual', value: 'manual' },
+				],
+				default: 'list',
+				description: 'Choose how to specify the type filter',
+			},
 			{
 				displayName: 'Type Filter',
 				name: 'clientTypeFilter',
@@ -1180,6 +1198,7 @@ export class TukiMate implements INodeType {
 					show: {
 						resource: [RESOURCES.CLIENT],
 						operation: [OPERATIONS.LIST],
+						clientTypeFilterMode: ['list'],
 					},
 				},
 				options: [
@@ -1192,6 +1211,38 @@ export class TukiMate implements INodeType {
 				description: 'Filter by client type',
 			},
 			{
+				displayName: 'Type Filter',
+				name: 'clientTypeFilterManual',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+						clientTypeFilterMode: ['manual'],
+					},
+				},
+				default: '',
+				description: 'Filter by client type (corporate, individual, partner, or empty for all)',
+			},
+			// Status Filter with List/Id mode
+			{
+				displayName: 'Status Filter Mode',
+				name: 'clientStatusFilterMode',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'From List', value: 'list' },
+					{ name: 'Manual', value: 'manual' },
+				],
+				default: 'list',
+				description: 'Choose how to specify the status filter',
+			},
+			{
 				displayName: 'Status Filter',
 				name: 'clientStatusFilter',
 				type: 'options',
@@ -1199,6 +1250,7 @@ export class TukiMate implements INodeType {
 					show: {
 						resource: [RESOURCES.CLIENT],
 						operation: [OPERATIONS.LIST],
+						clientStatusFilterMode: ['list'],
 					},
 				},
 				options: [
@@ -1211,6 +1263,38 @@ export class TukiMate implements INodeType {
 				description: 'Filter by client status',
 			},
 			{
+				displayName: 'Status Filter',
+				name: 'clientStatusFilterManual',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+						clientStatusFilterMode: ['manual'],
+					},
+				},
+				default: '',
+				description: 'Filter by client status (active, inactive, prospect, or empty for all)',
+			},
+			// Tier Filter with List/Id mode
+			{
+				displayName: 'Tier Filter Mode',
+				name: 'clientTierFilterMode',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'From List', value: 'list' },
+					{ name: 'Manual', value: 'manual' },
+				],
+				default: 'list',
+				description: 'Choose how to specify the tier filter',
+			},
+			{
 				displayName: 'Tier Filter',
 				name: 'clientTierFilter',
 				type: 'options',
@@ -1218,6 +1302,7 @@ export class TukiMate implements INodeType {
 					show: {
 						resource: [RESOURCES.CLIENT],
 						operation: [OPERATIONS.LIST],
+						clientTierFilterMode: ['list'],
 					},
 				},
 				options: [
@@ -1228,6 +1313,20 @@ export class TukiMate implements INodeType {
 				],
 				default: '',
 				description: 'Filter by client tier',
+			},
+			{
+				displayName: 'Tier Filter',
+				name: 'clientTierFilterManual',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+						clientTierFilterMode: ['manual'],
+					},
+				},
+				default: '',
+				description: 'Filter by client tier (standard, premium, enterprise, or empty for all)',
 			},
 			{
 				displayName: 'Search',
@@ -1242,6 +1341,24 @@ export class TukiMate implements INodeType {
 				default: '',
 				description: 'Search in client name',
 			},
+			// Order By with List/Manual mode
+			{
+				displayName: 'Order By Mode',
+				name: 'clientOrderByMode',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'From List', value: 'list' },
+					{ name: 'Manual', value: 'manual' },
+				],
+				default: 'list',
+				description: 'Choose how to specify the order by field',
+			},
 			{
 				displayName: 'Order By',
 				name: 'clientOrderBy',
@@ -1250,6 +1367,7 @@ export class TukiMate implements INodeType {
 					show: {
 						resource: [RESOURCES.CLIENT],
 						operation: [OPERATIONS.LIST],
+						clientOrderByMode: ['list'],
 					},
 				},
 				options: [
@@ -1260,8 +1378,23 @@ export class TukiMate implements INodeType {
 				description: 'Field to order by',
 			},
 			{
-				displayName: 'Order',
-				name: 'clientOrder',
+				displayName: 'Order By',
+				name: 'clientOrderByManual',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+						clientOrderByMode: ['manual'],
+					},
+				},
+				default: 'name',
+				description: 'Field to order by (name, created_at)',
+			},
+			// Order with List/Manual mode
+			{
+				displayName: 'Order Mode',
+				name: 'clientOrderMode',
 				type: 'options',
 				displayOptions: {
 					show: {
@@ -1270,11 +1403,43 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
+					{ name: 'From List', value: 'list' },
+					{ name: 'Manual', value: 'manual' },
+				],
+				default: 'list',
+				description: 'Choose how to specify the sort order',
+			},
+			{
+				displayName: 'Order',
+				name: 'clientOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+						clientOrderMode: ['list'],
+					},
+				},
+				options: [
 					{ name: 'Ascending', value: 'asc' },
 					{ name: 'Descending', value: 'desc' },
 				],
 				default: 'asc',
 				description: 'Sort order',
+			},
+			{
+				displayName: 'Order',
+				name: 'clientOrderManual',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.LIST],
+						clientOrderMode: ['manual'],
+					},
+				},
+				default: 'asc',
+				description: 'Sort order (asc, desc)',
 			},
 			{
 				displayName: 'Client ID',
@@ -1391,10 +1556,10 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of sources' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single source' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new source' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a source' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of sources', action: 'List sources' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single source', action: 'Get a source' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new source', action: 'Create a source' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a source', action: 'Update a source' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1464,7 +1629,7 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of conversation types' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of conversation types', action: 'List conversation types' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1481,10 +1646,10 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of all available tags' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single tag by ID' },
-					{ name: 'Get Conversation Tags', value: 'getConversationTags', description: 'Get tags for a specific conversation' },
-					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a tag' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of all available tags', action: 'List tags' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single tag by ID', action: 'Get a tag' },
+					{ name: 'Get Conversation Tags', value: 'getConversationTags', description: 'Get tags for a specific conversation', action: 'Get conversation tags' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a tag', action: 'Delete a tag' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1529,8 +1694,8 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of tag definitions' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new tag definition' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of tag definitions', action: 'List tag definitions' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new tag definition', action: 'Create a tag definition' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1625,11 +1790,11 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of categories' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single category' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new category' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a category' },
-					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a category' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of categories', action: 'List categories' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single category', action: 'Get a category' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new category', action: 'Create a category' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update a category', action: 'Update a category' },
+					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a category', action: 'Delete a category' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1699,8 +1864,8 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of analyses' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single analysis' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of analyses', action: 'List analyses' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single analysis', action: 'Get an analysis' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -1807,10 +1972,10 @@ export class TukiMate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of opportunities' },
-					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single opportunity' },
-					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new opportunity' },
-					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update an opportunity' },
+					{ name: 'List', value: OPERATIONS.LIST, description: 'Get a list of opportunities', action: 'List opportunities' },
+					{ name: 'Get', value: OPERATIONS.GET, description: 'Get a single opportunity', action: 'Get an opportunity' },
+					{ name: 'Create', value: OPERATIONS.CREATE, description: 'Create a new opportunity', action: 'Create an opportunity' },
+					{ name: 'Update', value: OPERATIONS.UPDATE, description: 'Update an opportunity', action: 'Update an opportunity' },
 				],
 				default: OPERATIONS.LIST,
 			},
@@ -2366,12 +2531,32 @@ export class TukiMate implements INodeType {
 				// ==================== CLIENT ====================
 				else if (resource === RESOURCES.CLIENT) {
 					if (operation === OPERATIONS.LIST) {
-						const clientTypeFilter = this.getNodeParameter('clientTypeFilter', i, '') as string;
-						const clientStatusFilter = this.getNodeParameter('clientStatusFilter', i, '') as string;
-						const clientTierFilter = this.getNodeParameter('clientTierFilter', i, '') as string;
+						// Get filter values based on mode
+						const clientTypeFilterMode = this.getNodeParameter('clientTypeFilterMode', i, 'list') as string;
+						const clientStatusFilterMode = this.getNodeParameter('clientStatusFilterMode', i, 'list') as string;
+						const clientTierFilterMode = this.getNodeParameter('clientTierFilterMode', i, 'list') as string;
+
+						const clientTypeFilter = clientTypeFilterMode === 'manual'
+							? this.getNodeParameter('clientTypeFilterManual', i, '') as string
+							: this.getNodeParameter('clientTypeFilter', i, '') as string;
+						const clientStatusFilter = clientStatusFilterMode === 'manual'
+							? this.getNodeParameter('clientStatusFilterManual', i, '') as string
+							: this.getNodeParameter('clientStatusFilter', i, '') as string;
+						const clientTierFilter = clientTierFilterMode === 'manual'
+							? this.getNodeParameter('clientTierFilterManual', i, '') as string
+							: this.getNodeParameter('clientTierFilter', i, '') as string;
+
 						const clientSearch = this.getNodeParameter('clientSearch', i, '') as string;
-						const clientOrderBy = this.getNodeParameter('clientOrderBy', i, 'name') as string;
-						const clientOrder = this.getNodeParameter('clientOrder', i, 'asc') as string;
+
+						// Order By and Order modes
+						const clientOrderByMode = this.getNodeParameter('clientOrderByMode', i, 'list') as string;
+						const clientOrderMode = this.getNodeParameter('clientOrderMode', i, 'list') as string;
+						const clientOrderBy = clientOrderByMode === 'manual'
+							? this.getNodeParameter('clientOrderByManual', i, 'name') as string
+							: this.getNodeParameter('clientOrderBy', i, 'name') as string;
+						const clientOrder = clientOrderMode === 'manual'
+							? this.getNodeParameter('clientOrderManual', i, 'asc') as string
+							: this.getNodeParameter('clientOrder', i, 'asc') as string;
 
 						const query: Record<string, string> = {};
 						if (clientTypeFilter) query.type = clientTypeFilter;
