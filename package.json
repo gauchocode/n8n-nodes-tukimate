@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-tukimate",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "n8n community node for TukiMate API",
   "keywords": [
     "n8n",
