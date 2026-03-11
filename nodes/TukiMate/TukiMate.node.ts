@@ -6,9 +6,17 @@ import {
 	NodeOperationError,
 	ILoadOptionsFunctions,
 	INodePropertyOptions,
+	INodeParameterResourceLocator,
 } from 'n8n-workflow';
 
 const BASE_URL = 'https://app.tukimate.com/api';
+
+// Helper to extract value from resourceLocator parameter
+function getResourceLocatorValue(param: INodeParameterResourceLocator | string | undefined): string {
+	if (!param) return '';
+	if (typeof param === 'string') return param;
+	return param.value as string || '';
+}
 
 // Resource definitions
 const RESOURCES = {
@@ -331,49 +339,88 @@ export class TukiMate implements INodeType {
 			{
 				displayName: 'Team',
 				name: 'teamId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getTeams',
-				},
+				type: 'resourceLocator',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: '',
+				default: { mode: 'list', value: '' },
+				modes: [
+					{
+						displayName: 'From List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getTeams',
+						},
+					},
+					{
+						displayName: 'By ID',
+						name: 'id',
+						type: 'string',
+						placeholder: 'Enter team ID',
+					},
+				],
 				description: 'Set by team',
 			},
 			{
 				displayName: 'Client',
 				name: 'clientId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getClients',
-				},
+				type: 'resourceLocator',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: '',
+				default: { mode: 'list', value: '' },
+				modes: [
+					{
+						displayName: 'From List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getClients',
+						},
+					},
+					{
+						displayName: 'By ID',
+						name: 'id',
+						type: 'string',
+						placeholder: 'Enter client ID',
+					},
+				],
 				description: 'Set by client',
 			},
 			{
 				displayName: 'Project',
 				name: 'projectId',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getProjects',
-				},
+				type: 'resourceLocator',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: '',
+				default: { mode: 'list', value: '' },
+				modes: [
+					{
+						displayName: 'From List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getProjects',
+						},
+					},
+					{
+						displayName: 'By ID',
+						name: 'id',
+						type: 'string',
+						placeholder: 'Enter project ID',
+					},
+				],
 				description: 'Set by project',
 			},
 
@@ -416,31 +463,70 @@ export class TukiMate implements INodeType {
 					{
 						displayName: 'Team',
 						name: 'teamId',
-						type: 'options',
-						typeOptions: {
-							loadOptionsMethod: 'getTeams',
-						},
-						default: '',
+						type: 'resourceLocator',
+						default: { mode: 'list', value: '' },
+						modes: [
+							{
+								displayName: 'From List',
+								name: 'list',
+								type: 'list',
+								typeOptions: {
+									searchListMethod: 'getTeams',
+								},
+							},
+							{
+								displayName: 'By ID',
+								name: 'id',
+								type: 'string',
+								placeholder: 'Enter team ID',
+							},
+						],
 						description: 'Filter by team',
 					},
 					{
 						displayName: 'Client',
 						name: 'clientId',
-						type: 'options',
-						typeOptions: {
-							loadOptionsMethod: 'getClients',
-						},
-						default: '',
+						type: 'resourceLocator',
+						default: { mode: 'list', value: '' },
+						modes: [
+							{
+								displayName: 'From List',
+								name: 'list',
+								type: 'list',
+								typeOptions: {
+									searchListMethod: 'getClients',
+								},
+							},
+							{
+								displayName: 'By ID',
+								name: 'id',
+								type: 'string',
+								placeholder: 'Enter client ID',
+							},
+						],
 						description: 'Filter by client',
 					},
 					{
 						displayName: 'Project',
 						name: 'projectId',
-						type: 'options',
-						typeOptions: {
-							loadOptionsMethod: 'getProjects',
-						},
-						default: '',
+						type: 'resourceLocator',
+						default: { mode: 'list', value: '' },
+						modes: [
+							{
+								displayName: 'From List',
+								name: 'list',
+								type: 'list',
+								typeOptions: {
+									searchListMethod: 'getProjects',
+								},
+							},
+							{
+								displayName: 'By ID',
+								name: 'id',
+								type: 'string',
+								placeholder: 'Enter project ID',
+							},
+						],
 						description: 'Filter by project',
 					},
 					{
@@ -698,33 +784,59 @@ export class TukiMate implements INodeType {
 			{
 				displayName: 'Source',
 				name: 'sourceKey',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getSources',
-				},
+				type: 'resourceLocator',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: '',
+				default: { mode: 'list', value: '' },
+				modes: [
+					{
+						displayName: 'From List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getSources',
+						},
+					},
+					{
+						displayName: 'By Key',
+						name: 'key',
+						type: 'string',
+						placeholder: 'Enter source key',
+					},
+				],
 				description: 'Source of the conversation',
 			},
 			{
 				displayName: 'Conversation Type',
 				name: 'conversationTypeKey',
-				type: 'options',
-				typeOptions: {
-					loadOptionsMethod: 'getConversationTypes',
-				},
+				type: 'resourceLocator',
 				displayOptions: {
 					show: {
 						resource: [RESOURCES.CONVERSATION],
 						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
 					},
 				},
-				default: 'meeting',
+				default: { mode: 'list', value: 'meeting' },
+				modes: [
+					{
+						displayName: 'From List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getConversationTypes',
+						},
+					},
+					{
+						displayName: 'By Key',
+						name: 'key',
+						type: 'string',
+						placeholder: 'Enter conversation type key',
+					},
+				],
 				description: 'Type of conversation',
 			},
 			{
@@ -2212,9 +2324,9 @@ export class TukiMate implements INodeType {
 						// Additional options (includes Limit, Team, Client, Project filters)
 						const additionalOptions = this.getNodeParameter('additionalOptions', i, {}) as {
 							limit?: number;
-							teamId?: string;
-							clientId?: string;
-							projectId?: string;
+							teamId?: INodeParameterResourceLocator;
+							clientId?: INodeParameterResourceLocator;
+							projectId?: INodeParameterResourceLocator;
 							externalMeetingId?: string;
 							offset?: number;
 							dateFrom?: string;
@@ -2233,9 +2345,12 @@ export class TukiMate implements INodeType {
 						if (search) query.q = search;
 						query.limit = additionalOptions.limit ?? 10;
 						// Filters from additional options
-						if (additionalOptions.teamId) query.team = additionalOptions.teamId;
-						if (additionalOptions.clientId) query.client = additionalOptions.clientId;
-						if (additionalOptions.projectId) query.project = additionalOptions.projectId;
+						const teamIdValue = getResourceLocatorValue(additionalOptions.teamId);
+						const clientIdValue = getResourceLocatorValue(additionalOptions.clientId);
+						const projectIdValue = getResourceLocatorValue(additionalOptions.projectId);
+						if (teamIdValue) query.team = teamIdValue;
+						if (clientIdValue) query.client = clientIdValue;
+						if (projectIdValue) query.project = projectIdValue;
 						if (additionalOptions.externalMeetingId) query.sourceMeetingId = additionalOptions.externalMeetingId;
 						if (additionalOptions.offset !== undefined) query.offset = additionalOptions.offset;
 						if (additionalOptions.dateFrom) query.dateFrom = additionalOptions.dateFrom;
@@ -2261,11 +2376,16 @@ export class TukiMate implements INodeType {
 						const durationMinutes = this.getNodeParameter('durationMinutes', i, 0) as number;
 						const transcript = this.getNodeParameter('transcript', i) as string;
 						const sourceConversationId = this.getNodeParameter('sourceConversationId', i, '') as string;
-						const sourceKey = this.getNodeParameter('sourceKey', i, '') as string;
-						const conversationTypeKey = this.getNodeParameter('conversationTypeKey', i, 'meeting') as string;
-						const teamId = this.getNodeParameter('teamId', i, '') as string;
-						const projectId = this.getNodeParameter('projectId', i, '') as string;
-						const clientId = this.getNodeParameter('clientId', i, '') as string;
+						const sourceKeyParam = this.getNodeParameter('sourceKey', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const conversationTypeKeyParam = this.getNodeParameter('conversationTypeKey', i, { mode: 'list', value: 'meeting' }) as INodeParameterResourceLocator;
+						const teamIdParam = this.getNodeParameter('teamId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const projectIdParam = this.getNodeParameter('projectId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const clientIdParam = this.getNodeParameter('clientId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const sourceKey = getResourceLocatorValue(sourceKeyParam);
+						const conversationTypeKey = getResourceLocatorValue(conversationTypeKeyParam) || 'meeting';
+						const teamId = getResourceLocatorValue(teamIdParam);
+						const projectId = getResourceLocatorValue(projectIdParam);
+						const clientId = getResourceLocatorValue(clientIdParam);
 						const description = this.getNodeParameter('description', i, '') as string;
 						const participantsData = this.getNodeParameter('participants', i, {}) as any;
 						const language = this.getNodeParameter('language', i, 'en') as string;
@@ -2301,11 +2421,16 @@ export class TukiMate implements INodeType {
 						const durationMinutes = this.getNodeParameter('durationMinutes', i, undefined) as number | undefined;
 						const transcript = this.getNodeParameter('transcript', i, '') as string;
 						const sourceConversationId = this.getNodeParameter('sourceConversationId', i, '') as string;
-						const sourceKey = this.getNodeParameter('sourceKey', i, '') as string;
-						const conversationTypeKey = this.getNodeParameter('conversationTypeKey', i, '') as string;
-						const teamId = this.getNodeParameter('teamId', i, '') as string;
-						const projectId = this.getNodeParameter('projectId', i, '') as string;
-						const clientId = this.getNodeParameter('clientId', i, '') as string;
+						const sourceKeyParam = this.getNodeParameter('sourceKey', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const conversationTypeKeyParam = this.getNodeParameter('conversationTypeKey', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const teamIdParam = this.getNodeParameter('teamId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const projectIdParam = this.getNodeParameter('projectId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const clientIdParam = this.getNodeParameter('clientId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+						const sourceKey = getResourceLocatorValue(sourceKeyParam);
+						const conversationTypeKey = getResourceLocatorValue(conversationTypeKeyParam);
+						const teamId = getResourceLocatorValue(teamIdParam);
+						const projectId = getResourceLocatorValue(projectIdParam);
+						const clientId = getResourceLocatorValue(clientIdParam);
 						const description = this.getNodeParameter('description', i, '') as string;
 						const participantsData = this.getNodeParameter('participants', i, {}) as any;
 						const language = this.getNodeParameter('language', i, 'en') as string;
