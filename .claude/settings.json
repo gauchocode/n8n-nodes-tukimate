@@ -1,0 +1,64 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Skill(api-review)",
+      "Bash(docker:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker-compose:*)",
+      "Bash(git:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(mv:*)",
+      "Bash(chmod:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(echo:*)",
+      "Bash(xargs:*)",
+      "Bash(psql:*)",
+      "Bash(test:*)",
+      "Bash(curl:*)",
+      "Bash(sha256sum:*)",
+      "Bash(./scripts/*)",
+      "Bash(*.sh)",
+      "Bash(bash:*)",
+      "Bash(python3:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(diff:*)",
+      "Bash(command:*)",
+      "Bash(command -v:*)",
+      "Bash(claude:*)",
+      "Bash(timeout:*)",
+      "Bash(sudo:*)",
+      "Bash(openssl:*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)"
+    ],
+    "deny": [
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(yarn:*)",
+      "Bash(pnpm:*)",
+      "Bash(node:*)",
+      "Bash(rm -rf /*)",
+      "Bash(dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(fdisk:*)"
+    ],
+    "ask": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(docker system prune:*)",
+      "Bash(rm -rf:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
+}
