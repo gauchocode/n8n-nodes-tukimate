@@ -1042,6 +1042,42 @@ export class TukiMate implements INodeType {
 				default: 100,
 				description: 'Max number of results',
 			},
+			{
+				displayName: 'Sort By',
+				name: 'contactOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'First Name', value: 'first_name' },
+					{ name: 'Last Name', value: 'last_name' },
+					{ name: 'Email', value: 'email' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'contactOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONTACT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
+			},
 			// Contact LIST - Additional Options
 			{
 				displayName: 'Additional Options',
@@ -1106,6 +1142,40 @@ export class TukiMate implements INodeType {
 					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a team', action: 'Delete a team' },
 				],
 				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Sort By',
+				name: 'teamOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TEAM],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Name', value: 'name' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'teamOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TEAM],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
 			},
 			{
 				displayName: 'Team ID',
@@ -1203,6 +1273,41 @@ export class TukiMate implements INodeType {
 				],
 				default: '',
 				description: 'Filter by project status',
+			},
+			{
+				displayName: 'Sort By',
+				name: 'projectOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.PROJECT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Name', value: 'name' },
+					{ name: 'Status', value: 'status' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'projectOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.PROJECT],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
 			},
 			{
 				displayName: 'Project ID',
@@ -1676,6 +1781,41 @@ export class TukiMate implements INodeType {
 				default: OPERATIONS.LIST,
 			},
 			{
+				displayName: 'Sort By',
+				name: 'sourceOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.SOURCE],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Key', value: 'key' },
+					{ name: 'Label', value: 'label' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'sourceOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.SOURCE],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
+			},
+			{
 				displayName: 'Source ID',
 				name: 'sourceId',
 				type: 'string',
@@ -1745,6 +1885,41 @@ export class TukiMate implements INodeType {
 				],
 				default: OPERATIONS.LIST,
 			},
+			{
+				displayName: 'Sort By',
+				name: 'conversationTypeOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION_TYPE],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Key', value: 'key' },
+					{ name: 'Label', value: 'label' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'conversationTypeOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CONVERSATION_TYPE],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
+			},
 
 			// ==================== TAG ====================
 			{
@@ -1764,6 +1939,40 @@ export class TukiMate implements INodeType {
 					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a tag', action: 'Delete a tag' },
 				],
 				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Sort By',
+				name: 'tagOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Name', value: 'name' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'tagOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
 			},
 			{
 				displayName: 'Tag ID',
@@ -1830,6 +2039,41 @@ export class TukiMate implements INodeType {
 				],
 				default: '',
 				description: 'Filter by tag category',
+			},
+			{
+				displayName: 'Sort By',
+				name: 'tagDefOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Name', value: 'name' },
+					{ name: 'Category', value: 'category' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'tagDefOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.TAG_DEFINITION],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
 			},
 			{
 				displayName: 'Name',
@@ -1909,6 +2153,41 @@ export class TukiMate implements INodeType {
 					{ name: 'Delete', value: OPERATIONS.DELETE, description: 'Delete a category', action: 'Delete a category' },
 				],
 				default: OPERATIONS.LIST,
+			},
+			{
+				displayName: 'Sort By',
+				name: 'categoryOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Key', value: 'key' },
+					{ name: 'Label', value: 'label' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'categoryOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CATEGORY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
 			},
 			{
 				displayName: 'Category ID',
@@ -2053,6 +2332,41 @@ export class TukiMate implements INodeType {
 				},
 				default: 0,
 				description: 'Number of results to skip',
+			},
+			{
+				displayName: 'Sort By',
+				name: 'analysisOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Updated At', value: 'updated_at' },
+					{ name: 'Status', value: 'status' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'analysisOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
 			},
 
 			// ==================== USAGE ====================
@@ -2277,6 +2591,43 @@ export class TukiMate implements INodeType {
 				default: 0,
 				description: 'Number of results to skip',
 			},
+			{
+				displayName: 'Sort By',
+				name: 'opportunityOrderBy',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Created At', value: 'created_at' },
+					{ name: 'Updated At', value: 'updated_at' },
+					{ name: 'Title', value: 'title' },
+					{ name: 'Status', value: 'status' },
+					{ name: 'Expected Close Date', value: 'expected_close_date' },
+				],
+				default: 'created_at',
+				description: 'Field to order by',
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'opportunityOrder',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'Descending', value: 'desc' },
+					{ name: 'Ascending', value: 'asc' },
+				],
+				default: 'desc',
+				description: 'Sort order',
+			},
 
 			// ==================== SIMPLIFIED OUTPUT (common option) ====================
 			{
@@ -2479,6 +2830,8 @@ export class TukiMate implements INodeType {
 					if (operation === OPERATIONS.LIST) {
 						const contactSearch = this.getNodeParameter('contactSearch', i, '') as string;
 						const contactLimit = this.getNodeParameter('contactLimit', i, 100) as number;
+						const contactOrderBy = this.getNodeParameter('contactOrderBy', i, 'created_at') as string;
+						const contactOrder = this.getNodeParameter('contactOrder', i, 'desc') as string;
 
 						// Additional options
 						const additionalOptions = this.getNodeParameter('contactListAdditionalOptions', i, {}) as {
@@ -2494,6 +2847,8 @@ export class TukiMate implements INodeType {
 						if (additionalOptions.isActive !== undefined) query.is_active = additionalOptions.isActive;
 						if (additionalOptions.tagsFilter) query.tags = additionalOptions.tagsFilter;
 						if (additionalOptions.contactOffset !== undefined) query.offset = additionalOptions.contactOffset;
+						if (contactOrderBy) query.orderBy = contactOrderBy;
+						if (contactOrder) query.order = contactOrder;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/contacts', undefined, query);
 					}
@@ -2565,7 +2920,14 @@ export class TukiMate implements INodeType {
 				// ==================== TEAM ====================
 				else if (resource === RESOURCES.TEAM) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/teams');
+						const teamOrderBy = this.getNodeParameter('teamOrderBy', i, 'created_at') as string;
+						const teamOrder = this.getNodeParameter('teamOrder', i, 'desc') as string;
+
+						const query: Record<string, string> = {};
+						if (teamOrderBy) query.orderBy = teamOrderBy;
+						if (teamOrder) query.order = teamOrder;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/teams', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const teamId = this.getNodeParameter('teamId', i) as string;
@@ -2613,9 +2975,13 @@ export class TukiMate implements INodeType {
 				else if (resource === RESOURCES.PROJECT) {
 					if (operation === OPERATIONS.LIST) {
 						const projectStatusFilter = this.getNodeParameter('projectStatusFilter', i, '') as string;
+						const projectOrderBy = this.getNodeParameter('projectOrderBy', i, 'created_at') as string;
+						const projectOrder = this.getNodeParameter('projectOrder', i, 'desc') as string;
 
 						const query: Record<string, string> = {};
 						if (projectStatusFilter) query.status = projectStatusFilter;
+						if (projectOrderBy) query.orderBy = projectOrderBy;
+						if (projectOrder) query.order = projectOrder;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/projects', undefined, query);
 					}
@@ -2742,7 +3108,14 @@ export class TukiMate implements INodeType {
 				// ==================== SOURCE ====================
 				else if (resource === RESOURCES.SOURCE) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/sources');
+						const sourceOrderBy = this.getNodeParameter('sourceOrderBy', i, 'created_at') as string;
+						const sourceOrder = this.getNodeParameter('sourceOrder', i, 'desc') as string;
+
+						const query: Record<string, string> = {};
+						if (sourceOrderBy) query.orderBy = sourceOrderBy;
+						if (sourceOrder) query.order = sourceOrder;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/sources', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const sourceId = this.getNodeParameter('sourceId', i) as string;
@@ -2773,14 +3146,28 @@ export class TukiMate implements INodeType {
 				// ==================== CONVERSATION TYPE ====================
 				else if (resource === RESOURCES.CONVERSATION_TYPE) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/conversation-types');
+						const conversationTypeOrderBy = this.getNodeParameter('conversationTypeOrderBy', i, 'created_at') as string;
+						const conversationTypeOrder = this.getNodeParameter('conversationTypeOrder', i, 'desc') as string;
+
+						const query: Record<string, string> = {};
+						if (conversationTypeOrderBy) query.orderBy = conversationTypeOrderBy;
+						if (conversationTypeOrder) query.order = conversationTypeOrder;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/conversation-types', undefined, query);
 					}
 				}
 
 				// ==================== TAG ====================
 				else if (resource === RESOURCES.TAG) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/tags');
+						const tagOrderBy = this.getNodeParameter('tagOrderBy', i, 'created_at') as string;
+						const tagOrder = this.getNodeParameter('tagOrder', i, 'desc') as string;
+
+						const query: Record<string, string> = {};
+						if (tagOrderBy) query.orderBy = tagOrderBy;
+						if (tagOrder) query.order = tagOrder;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/tags', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const tagId = this.getNodeParameter('tagId', i) as string;
@@ -2800,8 +3187,12 @@ export class TukiMate implements INodeType {
 				else if (resource === RESOURCES.TAG_DEFINITION) {
 					if (operation === OPERATIONS.LIST) {
 						const tagDefCategory = this.getNodeParameter('tagDefCategory', i, '') as string;
+						const tagDefOrderBy = this.getNodeParameter('tagDefOrderBy', i, 'created_at') as string;
+						const tagDefOrder = this.getNodeParameter('tagDefOrder', i, 'desc') as string;
 						const query: Record<string, string> = {};
 						if (tagDefCategory) query.category = tagDefCategory;
+						if (tagDefOrderBy) query.orderBy = tagDefOrderBy;
+						if (tagDefOrder) query.order = tagDefOrder;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/tag-definitions', undefined, query);
 					}
@@ -2821,7 +3212,14 @@ export class TukiMate implements INodeType {
 				// ==================== CATEGORY ====================
 				else if (resource === RESOURCES.CATEGORY) {
 					if (operation === OPERATIONS.LIST) {
-						responseData = await tukiMateRequest.call(this, 'GET', '/categories');
+						const categoryOrderBy = this.getNodeParameter('categoryOrderBy', i, 'created_at') as string;
+						const categoryOrder = this.getNodeParameter('categoryOrder', i, 'desc') as string;
+
+						const query: Record<string, string> = {};
+						if (categoryOrderBy) query.orderBy = categoryOrderBy;
+						if (categoryOrder) query.order = categoryOrder;
+
+						responseData = await tukiMateRequest.call(this, 'GET', '/categories', undefined, query);
 					}
 					else if (operation === OPERATIONS.GET) {
 						const categoryId = this.getNodeParameter('categoryId', i) as string;
@@ -2866,10 +3264,14 @@ export class TukiMate implements INodeType {
 						const analysisStatus = this.getNodeParameter('analysisStatus', i, '') as string;
 						const analysisLimit = this.getNodeParameter('analysisLimit', i, 50) as number;
 						const analysisOffset = this.getNodeParameter('analysisOffset', i, 0) as number;
+						const analysisOrderBy = this.getNodeParameter('analysisOrderBy', i, 'created_at') as string;
+						const analysisOrder = this.getNodeParameter('analysisOrder', i, 'desc') as string;
 
 						const query: Record<string, string | number> = { limit: analysisLimit, offset: analysisOffset };
 						if (analysisConversationId) query.conversationId = analysisConversationId;
 						if (analysisStatus) query.status = analysisStatus;
+						if (analysisOrderBy) query.orderBy = analysisOrderBy;
+						if (analysisOrder) query.order = analysisOrder;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/analyses', undefined, query);
 					}
@@ -2886,10 +3288,14 @@ export class TukiMate implements INodeType {
 						const opportunityConversationId = this.getNodeParameter('opportunityConversationId', i, '') as string;
 						const opportunityLimit = this.getNodeParameter('opportunityLimit', i, 50) as number;
 						const opportunityOffset = this.getNodeParameter('opportunityOffset', i, 0) as number;
+						const opportunityOrderBy = this.getNodeParameter('opportunityOrderBy', i, 'created_at') as string;
+						const opportunityOrder = this.getNodeParameter('opportunityOrder', i, 'desc') as string;
 
 						const query: Record<string, string | number> = { limit: opportunityLimit, offset: opportunityOffset };
 						if (opportunityStatus) query.status = opportunityStatus;
 						if (opportunityConversationId) query.conversationId = opportunityConversationId;
+						if (opportunityOrderBy) query.orderBy = opportunityOrderBy;
+						if (opportunityOrder) query.order = opportunityOrder;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/opportunities', undefined, query);
 					}

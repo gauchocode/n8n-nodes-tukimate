@@ -63,6 +63,7 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 - **Source** - Filter by source key
 - **Type** - Filter by conversation type
 - **Has Analyses** - Filter by analysis status
+- **Sort By / Sort Order** - Sort results by supported fields
 - **Limit/Offset** - Pagination
 
 **Create/Update Fields:**
@@ -89,6 +90,7 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 - **Search** - Search in name, email
 - **Company** - Filter by company
 - **Tags** - Filter by tags
+- **Sort By / Sort Order** - Sort results by supported fields
 - **Limit/Offset** - Pagination
 
 **Create/Update Fields:**
@@ -107,6 +109,9 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | Update | Update an existing team |
 | Delete | Delete a team |
 
+**List Filters:**
+- **Sort By / Sort Order** - Sort results by supported fields
+
 ### Project
 | Operation | Description |
 |-----------|-------------|
@@ -115,6 +120,10 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | Create | Create a new project |
 | Update | Update an existing project |
 | Delete | Delete a project |
+
+**List Filters:**
+- **Status** - Filter by project status
+- **Sort By / Sort Order** - Sort results by supported fields
 
 ### Client
 | Operation | Description |
@@ -128,6 +137,7 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 **List Filters:**
 - **Type** - corporate, individual, partner
 - **Status** - active, inactive, prospect
+- **Sort By / Sort Order** - Sort results by supported fields
 - **Limit/Offset** - Pagination
 
 ### Source
@@ -138,10 +148,16 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | Create | Create a new source |
 | Update | Update an existing source |
 
+**List Filters:**
+- **Sort By / Sort Order** - Sort results by supported fields
+
 ### Conversation Type
 | Operation | Description |
 |-----------|-------------|
 | List | Get available conversation types (read-only) |
+
+**List Filters:**
+- **Sort By / Sort Order** - Sort results by supported fields
 
 ### Tag
 | Operation | Description |
@@ -152,11 +168,18 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | Search | Search tags by name |
 | Delete | Delete a tag |
 
+**List Filters:**
+- **Sort By / Sort Order** - Sort results by supported fields
+
 ### Tag Definition
 | Operation | Description |
 |-----------|-------------|
 | List | Get a list of tag definitions |
 | Create | Create a new tag definition |
+
+**List Filters:**
+- **Category** - Filter by tag category
+- **Sort By / Sort Order** - Sort results by supported fields
 
 **Create Fields:**
 - Name, Color, Description
@@ -171,6 +194,9 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 | Update | Update an existing category |
 | Delete | Delete a category |
 
+**List Filters:**
+- **Sort By / Sort Order** - Sort results by supported fields
+
 ### Analysis
 | Operation | Description |
 |-----------|-------------|
@@ -180,6 +206,7 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 **List Filters:**
 - **Conversation ID** - Filter by conversation
 - **Status** - PENDING, PROCESSING, COMPLETED, FAILED
+- **Sort By / Sort Order** - Sort results by supported fields
 - **Limit/Offset** - Pagination
 
 ### Analysis Job
@@ -204,6 +231,7 @@ This node can be used as a tool in n8n AI Agent workflows. Simply add it to your
 **List Filters:**
 - **Status** - pending, approved, rejected, converted
 - **Conversation ID** - Filter by conversation
+- **Sort By / Sort Order** - Sort results by supported fields
 - **Limit/Offset** - Pagination
 
 **Create/Update Fields:**
