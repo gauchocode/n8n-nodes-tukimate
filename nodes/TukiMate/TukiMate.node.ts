@@ -877,6 +877,11 @@ export class TukiMate implements INodeType {
 							{ displayName: 'Name', name: 'name', type: 'string', default: '' },
 							{ displayName: 'Email', name: 'email', type: 'string', default: '' },
 							{ displayName: 'Contact ID', name: 'contact_id', type: 'string', default: '' },
+							{ displayName: 'Identifier', name: 'identifier', type: 'string', default: '' },
+							{ displayName: 'Phone', name: 'phone', type: 'string', default: '' },
+							{ displayName: 'Job Title', name: 'job_title', type: 'string', default: '' },
+							{ displayName: 'Department', name: 'department', type: 'string', default: '' },
+							{ displayName: 'Company Name', name: 'company_name', type: 'string', default: '' },
 						],
 					},
 				],
@@ -1012,6 +1017,20 @@ export class TukiMate implements INodeType {
 						default: '',
 						description: 'Comma-separated tags',
 					},
+					{
+						displayName: 'Work Phone',
+						name: 'workPhone',
+						type: 'string',
+						default: '',
+						description: 'Work phone number',
+					},
+					{
+						displayName: 'Work Phone Extension',
+						name: 'workPhoneExtension',
+						type: 'string',
+						default: '',
+						description: 'Work phone extension',
+					},
 				],
 			},
 
@@ -1027,7 +1046,7 @@ export class TukiMate implements INodeType {
 					},
 				},
 				default: '',
-				description: 'Search in name and email',
+				description: 'Search across name, email, identifier, company name, phone, job title',
 			},
 			{
 				displayName: 'Limit',
@@ -1232,6 +1251,16 @@ export class TukiMate implements INodeType {
 						default: '#3b82f6',
 						description: 'Color hex code (e.g., #3b82f6)',
 					},
+					{
+						displayName: 'AI Context',
+						name: 'teamContext',
+						type: 'string',
+						default: '',
+						description: 'Context for AI analysis',
+						typeOptions: {
+							rows: 4,
+						},
+					},
 				],
 			},
 
@@ -1366,6 +1395,35 @@ export class TukiMate implements INodeType {
 				],
 				default: 'active',
 				description: 'Status of the project',
+			},
+			{
+				displayName: 'AI Context',
+				name: 'projectContext',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.PROJECT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Additional context for AI analysis',
+				typeOptions: {
+					rows: 4,
+				},
+			},
+			{
+				displayName: 'Color',
+				name: 'projectColor',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.PROJECT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '#3b82f6',
+				description: 'Color hex code (e.g., #3b82f6)',
 			},
 
 			// ==================== CLIENT ====================
@@ -1759,6 +1817,53 @@ export class TukiMate implements INodeType {
 				],
 				default: 'active',
 				description: 'Status of the client',
+			},
+			{
+				displayName: 'Tier',
+				name: 'tier',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				options: [
+					{ name: 'Standard', value: 'standard' },
+					{ name: 'Premium', value: 'premium' },
+					{ name: 'Enterprise', value: 'enterprise' },
+				],
+				default: 'standard',
+				description: 'Tier of the client',
+			},
+			{
+				displayName: 'Description',
+				name: 'clientDescription',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '',
+				description: 'Description of the client',
+				typeOptions: {
+					rows: 4,
+				},
+			},
+			{
+				displayName: 'Color',
+				name: 'clientColor',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.CLIENT],
+						operation: [OPERATIONS.CREATE, OPERATIONS.UPDATE],
+					},
+				},
+				default: '#3b82f6',
+				description: 'Color hex code (e.g., #3b82f6)',
 			},
 
 			// ==================== SOURCE ====================
@@ -2308,6 +2413,45 @@ export class TukiMate implements INodeType {
 				description: 'Filter by analysis status',
 			},
 			{
+				displayName: 'Job ID',
+				name: 'analysisJobId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by analysis job ID',
+			},
+			{
+				displayName: 'Team ID',
+				name: 'analysisTeamId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by team ID',
+			},
+			{
+				displayName: 'Project ID',
+				name: 'analysisProjectId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.ANALYSIS],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by project ID',
+			},
+			{
 				displayName: 'Limit',
 				name: 'analysisLimit',
 				type: 'number',
@@ -2566,6 +2710,65 @@ export class TukiMate implements INodeType {
 				description: 'Related conversation ID',
 			},
 			{
+				displayName: 'Type Filter',
+				name: 'opportunityTypeFilter',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				options: [
+					{ name: 'All', value: '' },
+					{ name: 'New Sale', value: 'nueva_venta' },
+					{ name: 'Upselling', value: 'upselling' },
+					{ name: 'Renewal/Retention', value: 'renovacion_retencion' },
+					{ name: 'Cross Sell', value: 'cross_sell' },
+				],
+				default: '',
+				description: 'Filter by opportunity type',
+			},
+			{
+				displayName: 'Owner ID',
+				name: 'opportunityOwnerId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by owner ID',
+			},
+			{
+				displayName: 'Team ID',
+				name: 'opportunityTeamId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: '',
+				description: 'Filter by team ID',
+			},
+			{
+				displayName: 'Include Relations',
+				name: 'opportunityIncludeRelations',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: [RESOURCES.OPPORTUNITY],
+						operation: [OPERATIONS.LIST],
+					},
+				},
+				default: false,
+				description: 'Include related data in the response',
+			},
+			{
 				displayName: 'Limit',
 				name: 'opportunityLimit',
 				type: 'number',
@@ -2702,7 +2905,7 @@ export class TukiMate implements INodeType {
 						if (teamIdValue) query.team = teamIdValue;
 						if (clientIdValue) query.client = clientIdValue;
 						if (projectIdValue) query.project = projectIdValue;
-						if (additionalOptions.externalMeetingId) query.sourceMeetingId = additionalOptions.externalMeetingId;
+						if (additionalOptions.externalMeetingId) query.source_meeting_id = additionalOptions.externalMeetingId;
 						if (additionalOptions.offset !== undefined) query.offset = additionalOptions.offset;
 						if (additionalOptions.dateFrom) query.dateFrom = additionalOptions.dateFrom;
 						if (additionalOptions.dateTo) query.dateTo = additionalOptions.dateTo;
@@ -2869,6 +3072,8 @@ export class TukiMate implements INodeType {
 							identifier?: string;
 							department?: string;
 							contactTags?: string;
+							workPhone?: string;
+							workPhoneExtension?: string;
 						};
 
 						const body: any = { first_name: firstName, last_name: lastName };
@@ -2879,6 +3084,8 @@ export class TukiMate implements INodeType {
 						if (additionalOptions.identifier) body.identifier = additionalOptions.identifier;
 						if (additionalOptions.department) body.department = additionalOptions.department;
 						if (additionalOptions.contactTags) body.tags = additionalOptions.contactTags.split(',').map((t: string) => t.trim());
+						if (additionalOptions.workPhone) body.work_phone = additionalOptions.workPhone;
+						if (additionalOptions.workPhoneExtension) body.work_phone_extension = additionalOptions.workPhoneExtension;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/contacts', body);
 					}
@@ -2896,6 +3103,8 @@ export class TukiMate implements INodeType {
 							identifier?: string;
 							department?: string;
 							contactTags?: string;
+							workPhone?: string;
+							workPhoneExtension?: string;
 						};
 
 						const body: any = {};
@@ -2908,6 +3117,8 @@ export class TukiMate implements INodeType {
 						if (additionalOptions.identifier) body.identifier = additionalOptions.identifier;
 						if (additionalOptions.department) body.department = additionalOptions.department;
 						if (additionalOptions.contactTags) body.tags = additionalOptions.contactTags.split(',').map((t: string) => t.trim());
+						if (additionalOptions.workPhone) body.work_phone = additionalOptions.workPhone;
+						if (additionalOptions.workPhoneExtension) body.work_phone_extension = additionalOptions.workPhoneExtension;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/contacts/${contactId}`, body);
 					}
@@ -2940,11 +3151,13 @@ export class TukiMate implements INodeType {
 						const additionalOptions = this.getNodeParameter('teamAdditionalOptions', i, {}) as {
 							description?: string;
 							color?: string;
+							teamContext?: string;
 						};
 
 						const body: any = { name };
 						if (additionalOptions.description) body.description = additionalOptions.description;
 						if (additionalOptions.color) body.color = additionalOptions.color;
+						if (additionalOptions.teamContext) body.context = additionalOptions.teamContext;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/teams', body);
 					}
@@ -2956,12 +3169,14 @@ export class TukiMate implements INodeType {
 						const additionalOptions = this.getNodeParameter('teamAdditionalOptions', i, {}) as {
 							description?: string;
 							color?: string;
+							teamContext?: string;
 						};
 
 						const body: any = {};
 						if (name) body.name = name;
 						if (additionalOptions.description) body.description = additionalOptions.description;
 						if (additionalOptions.color) body.color = additionalOptions.color;
+						if (additionalOptions.teamContext) body.context = additionalOptions.teamContext;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/teams/${teamId}`, body);
 					}
@@ -2993,10 +3208,14 @@ export class TukiMate implements INodeType {
 						const name = this.getNodeParameter('name', i) as string;
 						const description = this.getNodeParameter('description', i, '') as string;
 						const status = this.getNodeParameter('status', i, 'active') as string;
+						const projectContext = this.getNodeParameter('projectContext', i, '') as string;
+						const projectColor = this.getNodeParameter('projectColor', i, '#3b82f6') as string;
 
 						const body: any = { name };
 						if (description) body.description = description;
 						if (status) body.status = status;
+						if (projectContext) body.context = projectContext;
+						if (projectColor) body.color = projectColor;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/projects', body);
 					}
@@ -3005,11 +3224,15 @@ export class TukiMate implements INodeType {
 						const name = this.getNodeParameter('name', i, '') as string;
 						const description = this.getNodeParameter('description', i, '') as string;
 						const status = this.getNodeParameter('status', i, '') as string;
+						const projectContext = this.getNodeParameter('projectContext', i, '') as string;
+						const projectColor = this.getNodeParameter('projectColor', i, '') as string;
 
 						const body: any = {};
 						if (name) body.name = name;
 						if (description) body.description = description;
 						if (status) body.status = status;
+						if (projectContext) body.context = projectContext;
+						if (projectColor) body.color = projectColor;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/projects/${projectId}`, body);
 					}
@@ -3070,6 +3293,9 @@ export class TukiMate implements INodeType {
 						const website = this.getNodeParameter('website', i, '') as string;
 						const type = this.getNodeParameter('type', i, 'corporate') as string;
 						const status = this.getNodeParameter('status', i, 'active') as string;
+						const tier = this.getNodeParameter('tier', i, 'standard') as string;
+						const clientDescription = this.getNodeParameter('clientDescription', i, '') as string;
+						const clientColor = this.getNodeParameter('clientColor', i, '#3b82f6') as string;
 
 						const body: any = { name };
 						if (code) body.code = code;
@@ -3077,6 +3303,9 @@ export class TukiMate implements INodeType {
 						if (website) body.website = website;
 						if (type) body.type = type;
 						if (status) body.status = status;
+						if (tier) body.tier = tier;
+						if (clientDescription) body.description = clientDescription;
+						if (clientColor) body.color = clientColor;
 
 						responseData = await tukiMateRequest.call(this, 'POST', '/clients', body);
 					}
@@ -3088,6 +3317,9 @@ export class TukiMate implements INodeType {
 						const website = this.getNodeParameter('website', i, '') as string;
 						const type = this.getNodeParameter('type', i, '') as string;
 						const status = this.getNodeParameter('status', i, '') as string;
+						const tier = this.getNodeParameter('tier', i, '') as string;
+						const clientDescription = this.getNodeParameter('clientDescription', i, '') as string;
+						const clientColor = this.getNodeParameter('clientColor', i, '') as string;
 
 						const body: any = {};
 						if (name) body.name = name;
@@ -3096,6 +3328,9 @@ export class TukiMate implements INodeType {
 						if (website) body.website = website;
 						if (type) body.type = type;
 						if (status) body.status = status;
+						if (tier) body.tier = tier;
+						if (clientDescription) body.description = clientDescription;
+						if (clientColor) body.color = clientColor;
 
 						responseData = await tukiMateRequest.call(this, 'PATCH', `/clients/${clientId}`, body);
 					}
@@ -3266,12 +3501,18 @@ export class TukiMate implements INodeType {
 						const analysisOffset = this.getNodeParameter('analysisOffset', i, 0) as number;
 						const analysisOrderBy = this.getNodeParameter('analysisOrderBy', i, 'created_at') as string;
 						const analysisOrder = this.getNodeParameter('analysisOrder', i, 'desc') as string;
+						const analysisJobId = this.getNodeParameter('analysisJobId', i, '') as string;
+						const analysisTeamId = this.getNodeParameter('analysisTeamId', i, '') as string;
+						const analysisProjectId = this.getNodeParameter('analysisProjectId', i, '') as string;
 
 						const query: Record<string, string | number> = { limit: analysisLimit, offset: analysisOffset };
 						if (analysisConversationId) query.conversationId = analysisConversationId;
 						if (analysisStatus) query.status = analysisStatus;
 						if (analysisOrderBy) query.orderBy = analysisOrderBy;
 						if (analysisOrder) query.order = analysisOrder;
+						if (analysisJobId) query.jobId = analysisJobId;
+						if (analysisTeamId) query.team = analysisTeamId;
+						if (analysisProjectId) query.project = analysisProjectId;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/analyses', undefined, query);
 					}
@@ -3290,12 +3531,20 @@ export class TukiMate implements INodeType {
 						const opportunityOffset = this.getNodeParameter('opportunityOffset', i, 0) as number;
 						const opportunityOrderBy = this.getNodeParameter('opportunityOrderBy', i, 'created_at') as string;
 						const opportunityOrder = this.getNodeParameter('opportunityOrder', i, 'desc') as string;
+						const opportunityTypeFilter = this.getNodeParameter('opportunityTypeFilter', i, '') as string;
+						const opportunityOwnerId = this.getNodeParameter('opportunityOwnerId', i, '') as string;
+						const opportunityTeamId = this.getNodeParameter('opportunityTeamId', i, '') as string;
+						const opportunityIncludeRelations = this.getNodeParameter('opportunityIncludeRelations', i, false) as boolean;
 
-						const query: Record<string, string | number> = { limit: opportunityLimit, offset: opportunityOffset };
+						const query: Record<string, string | number | boolean> = { limit: opportunityLimit, offset: opportunityOffset };
 						if (opportunityStatus) query.status = opportunityStatus;
 						if (opportunityConversationId) query.conversationId = opportunityConversationId;
 						if (opportunityOrderBy) query.orderBy = opportunityOrderBy;
 						if (opportunityOrder) query.order = opportunityOrder;
+						if (opportunityTypeFilter) query.type = opportunityTypeFilter;
+						if (opportunityOwnerId) query.owner_id = opportunityOwnerId;
+						if (opportunityTeamId) query.team_id = opportunityTeamId;
+						if (opportunityIncludeRelations) query.include_relations = opportunityIncludeRelations;
 
 						responseData = await tukiMateRequest.call(this, 'GET', '/opportunities', undefined, query);
 					}
